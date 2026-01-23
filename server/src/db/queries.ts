@@ -50,7 +50,7 @@ export const createProduct = async (data: NewProduct) => {
   return product;
 };
 
-export const getAllProducts = async (id: string) => {
+export const getAllProducts = async () => {
   return db.query.products.findMany({
     with: {user: true},
     orderBy: (products, { desc }) => [desc(products.createdAt)] // square brackets are required because Drizzle ORM`s orderBy expects an array, even for a single column
@@ -104,8 +104,15 @@ export const createComment = async (data: NewComment) => {
   return comment;
 };
 
+export const getCommentById = async (id: string) => {
+  return db.query.comments.findFirst({
+    where: eq(comments.id, id),
+    with: { user: true },
+  });
+};
+
 export const deleteComment = async (id: string) => {
-  const existingComment = await getCommentsById(id);
+  const existingComment = await getCommentById(id);
   if (!existingComment) {
     throw new Error(`Comment with id ${id} does not exist`);
   }
@@ -114,10 +121,5 @@ export const deleteComment = async (id: string) => {
   return comment;
 };
 
-export const getCommentsById = async (id: string) => {
-  return db.query.comments.findFirst({
-    where: eq(comments.id, id),
-    with: { user: true },
-  });
-};
+
 
