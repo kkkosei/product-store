@@ -104,6 +104,13 @@ export const createComment = async (data: NewComment) => {
   return comment;
 };
 
+export const getCommentById = async (id: string) => {
+  return db.query.comments.findFirst({
+    where: eq(comments.id, id),
+    with: { user: true },
+  });
+};
+
 export const deleteComment = async (id: string) => {
   const existingComment = await getCommentById(id);
   if (!existingComment) {
@@ -114,10 +121,5 @@ export const deleteComment = async (id: string) => {
   return comment;
 };
 
-export const getCommentById = async (id: string) => {
-  return db.query.comments.findFirst({
-    where: eq(comments.id, id),
-    with: { user: true },
-  });
-};
+
 
