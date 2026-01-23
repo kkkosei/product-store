@@ -48,6 +48,7 @@ export const userRelations = relations(users, ({ many }) => ({
 export const productRelations = relations(products, ({ one, many }) => ({
   // fields: for the foreign key columns 
   // references: for the primary key columns
+  // if user is named differently, then we use (with: {user123: true}) in queries.ts
   user: one(users, { fields: [products.userId], references: [users.id] }),
   comments: many(comments),
 }));
