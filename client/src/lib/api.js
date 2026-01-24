@@ -1,4 +1,4 @@
-import api from "axios";
+import api from "./axios";
 
 //users api
 export const syncUser = async (userData) => {
@@ -39,11 +39,11 @@ export const deleteProduct = async (id) => {
 
 //comments api
 export const createComment = async ({productId, content}) => {
-  const {data} = await api.post(`/products/${productId}`, {content});
+  const {data} = await api.post(`/comments/${productId}`, {content});
   return data;
 };
 
 export const deleteComment = async ({commentId}) => {
-  const {data} = await api.delete(`/products/${commentId}`);
+  const {data} = await api.delete(`/comments/${commentId}`);
   return data;
 };
