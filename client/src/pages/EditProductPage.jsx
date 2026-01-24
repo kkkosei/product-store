@@ -6,4 +6,4 @@ function EditProductPage() {
   )
 }
 
-export default EditProductPage
+export default EditProductPage;
