@@ -7,6 +7,6 @@ export const useProducts = () => {
 };
 
 export const useCreateProduct = () => {
-  const result = useMutation({mutataionFn: createProduct});
+  const result = useMutation({ mutationFn: createProduct });
   return result;
 };
