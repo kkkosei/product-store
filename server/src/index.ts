@@ -9,7 +9,11 @@ import commentRoutes from "./routes/commentRoutes";
 
 const app = Express();
 
-app.use(cors({origin:ENV.FRONTEND_URL})); // enable CORS
+if (!ENV.FRONTEND_URL) {
+  throw new Error("FRONTEND_URL is required for credentialed CORS");
+}
+app.use(cors({origin:ENV.FRONTEND_URL, credentials:true})); // enable CORS
+// credentials:true allows cookies to be sent/received across domains like frontend to backend
 app.use(clerkMiddleware()); // auth obj will be attached to req
 app.use(Express.json()); // parses json requests bodies
 app.use(Express.urlencoded({ extended: true })); // parses from data (like HTML forms)
