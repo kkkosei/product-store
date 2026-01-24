@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PalettenIcon } from "lucide-react";
+import { PaletteIcon } from "lucide-react";
 
 const THEMES = [
   "light",
@@ -38,11 +38,10 @@ const THEMES = [
 
 function ThemeSelector() {
   const [theme, setTheme] = useState(() => {
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       return localStorage.getItem("theme") || "forest";
     }
-
-    return"forest";
+    return "forest";
   });
 
   useEffect(() => {
@@ -53,9 +52,10 @@ function ThemeSelector() {
   return (
     <div className="dropdown dropdown-end">
       <div tabIndex={0} role="button" className="btn btn-ghost btn-sm gap-1">
-        <PalettenIcon className="size-4" />
+        <PaletteIcon className="size-4" />
         <span className="hidden sm:inline">Theme</span>
       </div>
+
       <ul
         tabIndex={0}
         className="dropdown-content menu bg-base-200 rounded-box z-50 w-56 p-2 shadow-xl max-h-96 overflow-y-auto flex-nowrap"
@@ -80,7 +80,6 @@ function ThemeSelector() {
         ))}
       </ul>
     </div>
-  )
+  );
 }
-
-export default ThemeSelector
+export default ThemeSelector;
