@@ -5,7 +5,7 @@ import { SendIcon, Trash2Icon, MessageSquareIcon, LogInIcon } from "lucide-react
 
 function CommentsSection({productId, comments=[], currentUserId}) {
   const { isSignedIn } = useAuth();
-  const { content, setContent } = useState("");
+  const [content, setContent] = useState("");
   const createComment = useCreateComment();
   const deleteComment = useDeleteComment(productId);
 
@@ -56,7 +56,7 @@ function CommentsSection({productId, comments=[], currentUserId}) {
           </SignInButton>
         </div>
       )}
-      <div className="space-y-2 max-h-80 overflow-f-auto">
+      <div className="space-y-2 max-h-80 overflow-y-auto">
         {comments.length === 0 ? (
           <div className="text-center py-8 text-base-content/50">
             <MessageSquareIcon className="size-8 mx-auto mb-2 opacity-30"/>
