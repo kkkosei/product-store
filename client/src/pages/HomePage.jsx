@@ -22,11 +22,11 @@ function HomePage() {
       <div className="hero-content flex-col lg:flex-row-reverse gap-10 py-10">
         <div className="relative">
           <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-110" />
-          <img
+          {/* <img
             src="/image.png"
             alt="Creator"
             className="relative h-64 lg:h-72 rounded-2xl shadow-2xl"
-          />
+          /> */}
         </div>
         <div className="text-center lg:text-left">
           <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
