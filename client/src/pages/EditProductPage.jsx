@@ -2,6 +2,7 @@ import { useNavigate, useParams, Link } from "react-router";
 import { useAuth } from "@clerk/clerk-react";
 import { useProduct, useUpdateProduct } from "../hooks/useProducts";
 import LoadingSpinner from "../components/LoadingSpinner";
+import EditProductForm from "../components/EditProductForm";
 
 function EditProductPage() {
   const { id } = useParams();
