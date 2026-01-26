@@ -1,0 +1,23 @@
+{
+  "name": "product_store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client && npm run build --prefix server",
+    "migrate": "npm run db:push --prefix server",
+    "start": "npm run start --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kkkosei/product-store.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kkkosei/product-store/issues"
+  },
+  "homepage": "https://github.com/kkkosei/product-store#readme"
+}
