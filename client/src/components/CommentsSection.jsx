@@ -36,7 +36,6 @@ function CommentsSection({productId, comments=[], currentUserId}) {
           <button
             type="submit"
             className="btn btn-primary btn-sm btn-square"
-            aria-label="Add comment"
             disabled={createComment.isPending || !content.trim()}
           >
             {createComment.isPending ? (
@@ -84,11 +83,10 @@ function CommentsSection({productId, comments=[], currentUserId}) {
               {currentUserId === comment.userId && (
                 <div className="chat-footer">
                   <button
-                    onClick={(
+                    onClick={() =>
                       confirm("Delete?") && deleteComment.mutate({ commentId: comment.id})
-                    )}
+                    }
                     className="btn btn-ghost btn-xs text-error"
-                    aria-label="Delete comment"
                     disabled={deleteComment.isPending}
                   >
                     {deleteComment.isPending ? (
