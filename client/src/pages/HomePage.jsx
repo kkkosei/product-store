@@ -35,7 +35,7 @@ function HomePage() {
           <p className="py-4 text-base-content/60">
             Upload, discover, and connect with learners.
           </p>
-          <div class="flex space-x-4">
+          <div className="flex space-x-4">
             <SignInButton mode="modal">
               <button className="btn btn-primary">
                 <SparklesIcon className="size-4" />
