@@ -30,17 +30,23 @@ function HomePage() {
         </div>
         <div className="text-center lg:text-left">
           <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-            Share Your <span className="text-primary">Products</span>
+            Share Your <span className="text-primary">Study Log</span>
           </h1>
           <p className="py-4 text-base-content/60">
-            Upload, discover, and connect with creators.
+            Upload, discover, and connect with learners.
           </p>
-          <SignInButton mode="modal">
-            <button className="btn btn-primary">
-              <SparklesIcon className="size-4" />
-              Start Selling
-            </button>
-          </SignInButton>
+          <div class="flex space-x-4">
+            <SignInButton mode="modal">
+              <button className="btn btn-primary">
+                <SparklesIcon className="size-4" />
+                Start Studying
+              </button>
+            </SignInButton>
+            <Link to="/product" className="btn btn-primary">
+              timer & task
+            </Link> 
+          </div>
+
         </div>
       </div>
     </div>
@@ -49,7 +55,7 @@ function HomePage() {
     <div>
       <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
         <PackageIcon className="size-5 text-primary" />
-        All Products
+        All Logs
       </h2>
 
       {products.length === 0 ? (
