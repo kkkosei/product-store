@@ -13,7 +13,7 @@ function Navbar() {
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost gap-2">
             <ShoppingBagIcon className="size-5 text-primary" />
-            <span className="text-lg font-bold font-mono uppercase tracking-wider">Product Store</span>
+            <span className="text-lg font-bold font-mono uppercase tracking-wider">Study Log</span>
           </Link>
         </div>
 
@@ -23,7 +23,7 @@ function Navbar() {
             <>
               <Link to="/create" className="btn btn-primary btn-sm gap-1">
                 <PlusIcon className="size-4" />
-                <span className="hidden sm:inline">New Product</span>
+                <span className="hidden sm:inline">New Log</span>
               </Link>
               <Link to="/profile" className="btn btn-ghost btn-sm gap-1">
                 <UserIcon className="size-4" />

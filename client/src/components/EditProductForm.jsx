@@ -20,7 +20,7 @@ function EditProductForm({product, isPending, isError, onSubmit}) {
         <div className="card-body">
           <h1 className="card-title">
             <SaveIcon className="size-5 text-primary" />
-            Edit Product
+            Edit Project
           </h1>
 
           <form 
