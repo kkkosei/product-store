@@ -2,10 +2,10 @@ import { db } from "./index"
 import { eq } from "drizzle-orm"
 import { 
   users,
-  products, 
+  projects, 
   comments, 
   type NewUser, 
-  type NewProduct, 
+  type NewProject, 
   type NewComment 
 } from "./schema"
 
@@ -44,22 +44,22 @@ export const upsertUser = async (data: NewUser) => {
   return user;
 };
 
-// Product Queries
-export const createProduct = async (data: NewProduct) => {
-  const [product] = await db.insert(products).values(data).returning();
-  return product;
+// Project Queries
+export const createProject = async (data: NewProject) => {
+  const [project] = await db.insert(projects).values(data).returning();
+  return project;
 };
 
-export const getAllProducts = async () => {
-  return db.query.products.findMany({
+export const getAllProjects = async () => {
+  return db.query.projects.findMany({
     with: {user: true},
-    orderBy: (products, { desc }) => [desc(products.createdAt)] // square brackets are required because Drizzle ORM`s orderBy expects an array, even for a single column
+    orderBy: (projects, { desc }) => [desc(projects.createdAt)] // square brackets are required because Drizzle ORM`s orderBy expects an array, even for a single column
   });
 };
 
-export const getProductById = async (id: string) => {
-  return db.query.products.findFirst({
-    where: eq(products.id, id),
+export const getProjectById = async (id: string) => {
+  return db.query.projects.findFirst({
+    where: eq(projects.id, id),
     with: { 
       user: true, 
       comments: { 
@@ -70,32 +70,32 @@ export const getProductById = async (id: string) => {
   });
 };
 
-export const getProductsByUserId = async (userId: string) => {
-  return db.query.products.findMany({
-    where: eq(products.userId, userId),
+export const getProjectsByUserId = async (userId: string) => {
+  return db.query.projects.findMany({
+    where: eq(projects.userId, userId),
     with: { user: true },
-    orderBy: (products, { desc }) => [desc(products.createdAt)],
+    orderBy: (projects, { desc }) => [desc(projects.createdAt)],
   });
 };
 
-export const updateProduct = async (id: string, data: Partial<NewProduct>) => {
-  const existingProduct = await getProductById(id);
-  if (!existingProduct) {
-    throw new Error(`Product with id ${id} does not exist`);
+export const updateProject = async (id: string, data: Partial<NewProject>) => {
+  const existingProject = await getProjectById(id);
+  if (!existingProject) {
+    throw new Error(`Project with id ${id} does not exist`);
   }
 
-  const [product] = await db.update(products).set(data).where(eq(products.id, id)).returning();
-  return product;
+  const [project] = await db.update(projects).set(data).where(eq(projects.id, id)).returning();
+  return project;
 };
 
-export const deleteProduct = async (id: string) => {
-  const existingProduct = await getProductById(id);
-  if (!existingProduct) {
-    throw new Error(`Product with id ${id} does not exist`);
+export const deleteProject = async (id: string) => {
+  const existingProject = await getProjectById(id);
+  if (!existingProject) {
+    throw new Error(`Project with id ${id} does not exist`);
   }
 
-  const [product] = await db.delete(products).where(eq(products.id, id)).returning();
-  return product;
+  const [project] = await db.delete(projects).where(eq(projects.id, id)).returning();
+  return project;
 };
 
 // Comment Queries
