@@ -22,7 +22,7 @@ app.use(Express.urlencoded({ extended: true })); // parses from data (like HTML 
 
 app.get("/api/health", (req, res) => {
   res.json({ 
-    message: "Welcome to Projectify API - Powered by PostgresSQL, Dizzle ORM & Clerk Auth" ,
+    message: "Welcome to study log API - Powered by PostgresSQL, Dizzle ORM & Clerk Auth" ,
     endpoints: {
       users: "/api/users",
       projects: "/api/projects",
