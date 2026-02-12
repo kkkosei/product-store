@@ -6,40 +6,40 @@ export const syncUser = async (userData) => {
   return data;
 };
 
-//products api
-export const getAllProducts = async () => {
-  const {data} = await api.get("/products");
+//projects api
+export const getAllProjects = async () => {
+  const {data} = await api.get("/projects");
   return data;
 };
 
-export const getProductById = async (id) => {
-  const {data} = await api.get(`/products/${id}`);
+export const getProjectById = async (id) => {
+  const {data} = await api.get(`/projects/${id}`);
   return data;
 };
 
-export const getMyProducts = async () => {
-  const {data} = await api.get("/products/my");
+export const getMyProjects = async () => {
+  const {data} = await api.get("/projects/my");
   return data;
 };
 
-export const createProduct = async (productData) => {
-  const {data} = await api.post("/products", productData);
+export const createProject = async (projectData) => {
+  const {data} = await api.post("/projects", projectData);
   return data;
 };
 
-export const updateProduct = async ({id, ...productData}) => {
-  const {data} = await api.put(`/products/${id}`, productData);
+export const updateProject = async ({id, ...projectData}) => {
+  const {data} = await api.put(`/projects/${id}`, projectData);
   return data;
 };
 
-export const deleteProduct = async (id) => {
-  const {data} = await api.delete(`/products/${id}`);
+export const deleteProject = async (id) => {
+  const {data} = await api.delete(`/projects/${id}`);
   return data;
 };
 
 //comments api
-export const createComment = async ({productId, content}) => {
-  const {data} = await api.post(`/comments/${productId}`, {content});
+export const createComment = async ({projectId, content}) => {
+  const {data} = await api.post(`/comments/${projectId}`, {content});
   return data;
 };
 

@@ -2,30 +2,30 @@ import { ArrowLeftIcon, EditIcon, Trash2Icon, CalendarIcon, UserIcon } from "luc
 import LoadingSpinner from "../components/LoadingSpinner";
 import CommentsSection from "../components/CommentsSection";
 import { useAuth } from "@clerk/clerk-react";
-import { useProduct, useDeleteProduct } from "../hooks/useProducts";
+import { useProject, useDeleteProject } from "../hooks/useProjects";
 import { useParams, Link, useNavigate } from "react-router";
 
-function ProductPage() {
+function ProjectPage() {
   const { id } = useParams();
   const { userId } = useAuth();
   const navigate = useNavigate();
 
-  const { data: product, isLoading, error } = useProduct(id);
-  const deleteProduct = useDeleteProduct();
+  const { data: project, isLoading, error } = useProject(id);
+  const deleteProject = useDeleteProject();
 
   const handleDelete = () => {
-    if (confirm("Delete this product permanently?")) {
-      deleteProduct.mutate(id, { onSuccess: () => navigate("/") });
+    if (confirm("Delete this project permanently?")) {
+      deleteProject.mutate(id, { onSuccess: () => navigate("/") });
     }
   };
 
   if (isLoading) return <LoadingSpinner />;
 
-  if (error || !product) {
+  if (error || !project) {
     return (
       <div className="card bg-base-300 max-w-md mx-auto">
         <div className="card-body items-center text-center">
-          <h2 className="card-title text-error">Product not found</h2>
+          <h2 className="card-title text-error">Project not found</h2>
           <Link to="/" className="btn btn-primary btn-sm">
             Go Home
           </Link>
@@ -34,7 +34,7 @@ function ProductPage() {
     );
   }
 
-  const isOwner = userId === product.userId;
+  const isOwner = userId === project.userId;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -44,15 +44,15 @@ function ProductPage() {
         </Link>
         {isOwner && (
           <div className="flex gap-2">
-            <Link to={`/edit/${product.id}`} className="btn btn-ghost btn-sm gap-1">
+            <Link to={`/edit/${project.id}`} className="btn btn-ghost btn-sm gap-1">
               <EditIcon className="size-4" /> Edit
             </Link>
             <button
               onClick={handleDelete}
               className="btn btn-error btn-sm gap-1"
-              disabled={deleteProduct.isPending}
+              disabled={deleteProject.isPending}
             >
-              {deleteProduct.isPending ? (
+              {deleteProject.isPending ? (
                 <span className="loading loading-spinner loading-xs" />
               ) : (
                 <Trash2Icon className="size-4" />
@@ -68,8 +68,8 @@ function ProductPage() {
         <div className="card bg-base-300">
           <figure className="p-4">
             <img
-              src={product.imageUrl}
-              alt={product.title}
+              src={project.imageUrl}
+              alt={project.title}
               className="rounded-xl w-full h-80 object-cover"
             />
           </figure>
@@ -77,34 +77,34 @@ function ProductPage() {
 
         <div className="card bg-base-300">
           <div className="card-body">
-            <h1 className="card-title text-2xl">{product.title}</h1>
+            <h1 className="card-title text-2xl">{project.title}</h1>
 
             <div className="flex flex-wrap gap-4 text-sm text-base-content/60 my-2">
               <div className="flex items-center gap-1">
                 <CalendarIcon className="size-4" />
-                {new Date(product.createdAt).toLocaleDateString()}
+                {new Date(project.createdAt).toLocaleDateString()}
               </div>
               <div className="flex items-center gap-1">
                 <UserIcon className="size-4" />
-                {product.user?.name}
+                {project.user?.name}
               </div>
             </div>
 
             <div className="divider my-2"></div>
 
-            <p className="text-base-content/80 leading-relaxed">{product.description}</p>
+            <p className="text-base-content/80 leading-relaxed">{project.description}</p>
 
-            {product.user && (
+            {project.user && (
               <>
                 <div className="divider my-2"></div>
                 <div className="flex items-center gap-3">
                   <div className="avatar">
                     <div className="w-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                      <img src={product.user.imageUrl} alt={product.user.name} />
+                      <img src={project.user.imageUrl} alt={project.user.name} />
                     </div>
                   </div>
                   <div>
-                    <p className="font-semibold">{product.user.name}</p>
+                    <p className="font-semibold">{project.user.name}</p>
                     <p className="text-xs text-base-content/50">Creator</p>
                   </div>
                 </div>
@@ -117,11 +117,11 @@ function ProductPage() {
       {/* Comments */}
       <div className="card bg-base-300">
         <div className="card-body">
-          <CommentsSection productId={id} comments={product.comments} currentUserId={userId} />
+          <CommentsSection projectId={id} comments={project.comments} currentUserId={userId} />
         </div>
       </div>
     </div>
   );
 }
 
-export default ProductPage;
+export default ProjectPage;

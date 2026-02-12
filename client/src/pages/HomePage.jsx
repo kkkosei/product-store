@@ -1,12 +1,12 @@
-import { useProducts } from "../hooks/useProducts";
+import { useProjects } from "../hooks/useProjects";
 import { PackageIcon, SparklesIcon } from "lucide-react";
 import { Link } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
-import ProductCard from "../components/ProductCard";
+import ProjectCard from "../components/ProjectCard";
 import { SignInButton } from "@clerk/clerk-react";
 
 function HomePage() {
-  const { data: products, isLoading, error } = useProducts();
+  const { data: projects, isLoading, error } = useProjects();
 
   if(isLoading) return <LoadingSpinner />;
   if(error) return (
@@ -42,7 +42,7 @@ function HomePage() {
                 Start Studying
               </button>
             </SignInButton>
-            <Link to="/product" className="btn btn-primary">
+            <Link to="/project" className="btn btn-primary">
               timer & task
             </Link> 
           </div>
@@ -51,14 +51,14 @@ function HomePage() {
       </div>
     </div>
 
-    {/* {PRODUCTS} */}
+    {/* {PROJECTS} */}
     <div>
       <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
         <PackageIcon className="size-5 text-primary" />
         All Logs
       </h2>
 
-      {products.length === 0 ? (
+      {projects.length === 0 ? (
         <div className="card bg-base-300">
           <div className="card-body items-center text-center py-16">
             <PackageIcon className="size-16 text-base-content/20" />
@@ -71,8 +71,8 @@ function HomePage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       )}
