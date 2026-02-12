@@ -1,24 +1,24 @@
 import { useNavigate, useParams, Link } from "react-router";
 import { useAuth } from "@clerk/clerk-react";
-import { useProduct, useUpdateProduct } from "../hooks/useProducts";
+import { useProject, useUpdateProject } from "../hooks/useProjects";
 import LoadingSpinner from "../components/LoadingSpinner";
-import EditProductForm from "../components/EditProductForm";
+import EditProjectForm from "../components/EditProjectForm";
 
-function EditProductPage() {
+function EditProjectPage() {
   const { id } = useParams();
   const { userId } = useAuth();
   const navigate = useNavigate();
   
-  const { data: product, isLoading } = useProduct(id);
-  const updateProduct = useUpdateProduct();
+  const { data: project, isLoading } = useProject(id);
+  const updateProject = useUpdateProject();
 
   if(isLoading) return <LoadingSpinner />;
 
-  if(!product || product.userId !== userId) {
+  if(!project || project.userId !== userId) {
     return (
       <div className="card bg-base-300 max-w-md mx-auto">
         <div className="card-body items-center text-center">
-          <h2 className="card-title text-error">{!product ? "Not found" : "Access denied"}</h2>
+          <h2 className="card-title text-error">{!project ? "Not found" : "Access denied"}</h2>
           <Link to="/" className="btn btn-primary btn-sm">
             Go Home
           </Link>
@@ -27,18 +27,18 @@ function EditProductPage() {
     );
   }
 
-  return <EditProductForm 
-    product={product}
-    isPending={updateProduct.isPending}
-    isError={updateProduct.isError}
+  return <EditProjectForm 
+    project={project}
+    isPending={updateProject.isPending}
+    isError={updateProject.isError}
     onSubmit={(formData) => {
-      updateProduct.mutate(
+      updateProject.mutate(
         {id, ...formData}, 
-        {onSuccess : () => navigate(`/product/${id}`)},
+        {onSuccess : () => navigate(`/project/${id}`)},
       )
     }}
   />
 
 }
 
-export default EditProductPage;
+export default EditProjectPage;

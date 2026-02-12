@@ -2,11 +2,11 @@ import { ArrowLeftIcon, ImageIcon, TypeIcon, FileTextIcon, SaveIcon } from "luci
 import { useState } from "react";
 import { Link } from "react-router";
 
-function EditProductForm({product, isPending, isError, onSubmit}) {
+function EditProjectForm({project, isPending, isError, onSubmit}) {
   const [formData, setFormData] = useState({
-    title: product.title,
-    description: product.description,
-    imageUrl: product.imageUrl
+    title: project.title,
+    description: project.description,
+    imageUrl: project.imageUrl
   })
 
 
@@ -34,7 +34,7 @@ function EditProductForm({product, isPending, isError, onSubmit}) {
               <TypeIcon className="size-4 text-base-content/50" />
               <input
                 type="text"
-                placeholder="Product title"
+                placeholder="Project title"
                 className="grow"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -95,4 +95,4 @@ function EditProductForm({product, isPending, isError, onSubmit}) {
 
 }
 
-export default EditProductForm
+export default EditProjectForm

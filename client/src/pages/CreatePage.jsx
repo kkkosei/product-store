@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router";
-import { useCreateProduct } from "../hooks/useProducts";
+import { useCreateProject } from "../hooks/useProjects";
 import { useState } from "react";
 import { ArrowLeftIcon, FileTextIcon, ImageIcon, SparklesIcon, TypeIcon } from "lucide-react";
 
 function CreatePage() {
   const navigate = useNavigate();
-  const createProduct = useCreateProduct();
+  const createProject = useCreateProject();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -14,7 +14,7 @@ function CreatePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createProduct.mutate(formData, {
+    createProject.mutate(formData, {
       onSuccess: () => {
         navigate("/");
       }
@@ -84,7 +84,7 @@ function CreatePage() {
             </div>
           </div>
 
-          {createProduct.isError && (
+          {createProject.isError && (
             <div role="alert" className="alert alert-error alert-sm">
               <span>Failed to create. Try again.</span>
             </div>
@@ -93,9 +93,9 @@ function CreatePage() {
           <button
             type="submit"
             className="btn btn-primary w-full"
-            disabled={createProduct.isPending}
+            disabled={createProject.isPending}
           >
-            {createProduct.isPending ? (
+            {createProject.isPending ? (
               <span className="loading loading-spinner" />
             ) : (
               "Create Project"

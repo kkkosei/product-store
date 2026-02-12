@@ -2,10 +2,10 @@ import { SignedIn, SignedOut, SignInButton, SignOutButton } from "@clerk/clerk-r
 import Navbar from "./components/Navbar";
 import { Navigate, Route, Routes } from "react-router";
 import HomePage from "./pages/HomePage";
-import ProductPage from "./pages/ProductPage";
+import ProjectPage from "./pages/ProjectPage";
 import ProfilePage from "./pages/ProfilePage";
 import CreatePage from "./pages/CreatePage";
-import EditProductPage from "./pages/EditProductPage";
+import EditProjectPage from "./pages/EditProjectPage";
 import useAuthReq from "./hooks/useAuthReq";
 import useUserSync from "./hooks/useUserSync";
 
@@ -21,10 +21,10 @@ function App() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/project/:id" element={<ProjectPage />} />
           <Route path="/profile" element={isSignedIn ? <ProfilePage/> : <Navigate to={"/"} />} />
           <Route path="/create" element={isSignedIn ? <CreatePage/> : <Navigate to={"/"} />} />
-          <Route path="/edit/:id" element={isSignedIn ? <EditProductPage/> : <Navigate to={"/"} />} />
+          <Route path="/edit/:id" element={isSignedIn ? <EditProjectPage/> : <Navigate to={"/"} />} />
         </Routes>
       </main>
     </div>

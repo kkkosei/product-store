@@ -3,16 +3,16 @@ import { useAuth, SignInButton } from "@clerk/clerk-react";
 import { useCreateComment, useDeleteComment } from "../hooks/useComments";
 import { SendIcon, Trash2Icon, MessageSquareIcon, LogInIcon } from "lucide-react";
 
-function CommentsSection({productId, comments=[], currentUserId}) {
+function CommentsSection({projectId, comments=[], currentUserId}) {
   const { isSignedIn } = useAuth();
   const [content, setContent] = useState("");
   const createComment = useCreateComment();
-  const deleteComment = useDeleteComment(productId);
+  const deleteComment = useDeleteComment(projectId);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content.trim()) return;
-    createComment.mutate({ productId, content }, { onSuccess: () => setContent("") });
+    createComment.mutate({ projectId, content }, { onSuccess: () => setContent("") });
   };
 
   return (
