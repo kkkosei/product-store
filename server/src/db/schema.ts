@@ -14,7 +14,7 @@ export const users = pgTable("users", {
     .$onUpdate(() => new Date() ),
 });
 
-export const products = pgTable("products", {
+export const projects = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
@@ -32,38 +32,39 @@ export const comments = pgTable("comments", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  productId: uuid("product_id")
+  projectId: uuid("project_id")
     .notNull()
-    .references(() => products.id, { onDelete: "cascade" }),
+    .references(() => projects
+    .id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 
 // Define relations
 export const userRelations = relations(users, ({ many }) => ({
-  products: many(products),
+  projects: many(projects),
   comments: many(comments),
 }));
 
-export const productRelations = relations(products, ({ one, many }) => ({
+export const projectRelations = relations(projects, ({ one, many }) => ({
   // fields: for the foreign key columns 
   // references: for the primary key columns
   // if user is named differently, then we use (with: {user123: true}) in queries.ts
-  user: one(users, { fields: [products.userId], references: [users.id] }),
+  user: one(users, { fields: [projects.userId], references: [users.id] }),
   comments: many(comments),
 }));
 
 export const commentsRelations = relations(comments, ({ one}) => ({
   user: one(users, { fields: [comments.userId], references: [users.id] }),
-  product: one(products, { fields: [comments.productId], references: [products.id] }),
+  project: one(projects, { fields: [comments.projectId], references: [projects.id] }),
 }));
 
 //Type inferences
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-export type Product = typeof products.$inferSelect;
-export type NewProduct = typeof products.$inferInsert;
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
 
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;

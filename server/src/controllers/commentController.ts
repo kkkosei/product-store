@@ -2,27 +2,27 @@ import type { Request, Response } from 'express';
 import * as queries from '../db/queries';
 import { getAuth } from '@clerk/express';
 
-// Create a new comment for a product (private)
+// Create a new comment for a project (private)
 export const createComment = async (req: Request, res: Response) => {
     try {
         const { userId } = getAuth(req);
         if (!userId) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
-        const { productId } = req.params;
+        const { projectId } = req.params;
         const { content } = req.body;
 
         if (!content) return res.status(400).json({ message: 'Comment content is required' });
 
-        const product = await queries.getProductById(String(productId));
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+        const project = await queries.getProjectById(String(projectId));
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
         }
 
         const comment = await queries.createComment({
             content,
             userId,
-            productId: String(productId),
+            projectId: String(projectId),
         });
         res.status(201).json(comment);
     } catch (error) {

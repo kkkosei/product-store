@@ -1,26 +1,26 @@
 import { Router } from "express";
-import * as productController from "../controllers/productController";
+import * as projectController from "../controllers/projectController";
 import { requireAuth } from "@clerk/express";
 
 const router = Router();
 
-// GET /api/products => get all products (public)
-router.get("/", productController.getAllProducts);
+// GET /api/projects => get all projects (public)
+router.get("/", projectController.getAllProjects);
 
-// GET /api/products/my => get products by current user (private)
-router.get("/my", requireAuth(), productController.getMyProducts);
+// GET /api/projects/my => get projects by current user (private)
+router.get("/my", requireAuth(), projectController.getMyProjects);
 
-// GET /api/products/:id => get product by id (public)
-router.get("/:id", productController.getProductById);
+// GET /api/projects/:id => get project by id (public)
+router.get("/:id", projectController.getProjectById);
 
-// POST /api/products => create a new product (private)
-router.post("/", requireAuth(), productController.createProduct);
+// POST /api/projects => create a new project (private)
+router.post("/", requireAuth(), projectController.createProject);
 
-// PUT /api/products/:id => update a product (private - owner only)
-router.put("/:id", requireAuth(), productController.updateProduct);
+// PUT /api/projects/:id => update a project (private - owner only)
+router.put("/:id", requireAuth(), projectController.updateProject);
 
-// DELETE /api/products/:id => delete a product (private - owner only)
-router.delete("/:id", requireAuth(), productController.deleteProduct);
+// DELETE /api/projects/:id => delete a project (private - owner only)
+router.delete("/:id", requireAuth(), projectController.deleteProject);
 
 
 export default router;
