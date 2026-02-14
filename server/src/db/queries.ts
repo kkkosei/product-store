@@ -128,16 +128,15 @@ export const startTimerSession = async (userId: string, taskId: string) => {
     .returning();
 };
 
-export const stopTimerSession = async (sessionId: string, durationSec: number) => {
-  return db.update(timerSessions)
-    .set({
-      endedAt: new Date(),
-      durationSec,
-      updatedAt: new Date(),
-    })
-    .where(eq(timerSessions.id, sessionId))
+export const stopCurrentTimerSession = async (userId: string, durationSec: number) => {
+  const now = new Date();
+  const [session] = await db.update(timerSessions)
+    .set({ endedAt: now, durationSec, updatedAt: now })
+    .where(and(eq(timerSessions.userId, userId), isNull(timerSessions.endedAt)))
     .returning();
+  return session;
 };
+
 
 
 
