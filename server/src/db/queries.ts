@@ -1,11 +1,15 @@
 import { db } from "./index"
-import { eq } from "drizzle-orm"
+import { and, eq, isNull } from "drizzle-orm";
 import { 
   users,
   projects, 
+  tasks,
+  timerSessions,
   comments, 
   type NewUser, 
   type NewProject, 
+  type NewTask,
+  type NewTimerSession,
   type NewComment 
 } from "./schema"
 
@@ -97,6 +101,45 @@ export const deleteProject = async (id: string) => {
   const [project] = await db.delete(projects).where(eq(projects.id, id)).returning();
   return project;
 };
+
+// Task Queries
+export const getTasksByProjectId = async (projectId: string, userId: string) => {
+  return db.query.tasks.findMany({
+    where: and(eq(tasks.projectId, projectId), eq(tasks.userId, userId)),
+    orderBy: (tasks, { desc }) => [desc(tasks.createdAt)],
+  });
+};
+
+// Timer Queries
+export const getCurrentTimerSession = async (userId: string) => {
+  return db.query.timerSessions.findFirst({
+    where: and(eq(timerSessions.userId, userId), isNull(timerSessions.endedAt)),
+    with: { task: true },
+  });
+};
+
+export const startTimerSession = async (userId: string, taskId: string) => {
+  return db.insert(timerSessions)
+    .values({
+      userId,
+      taskId,
+      startedAt: new Date(),
+    })
+    .returning();
+};
+
+export const stopTimerSession = async (sessionId: string, durationSec: number) => {
+  return db.update(timerSessions)
+    .set({
+      endedAt: new Date(),
+      durationSec,
+      updatedAt: new Date(),
+    })
+    .where(eq(timerSessions.id, sessionId))
+    .returning();
+};
+
+
 
 // Comment Queries
 export const createComment = async (data: NewComment) => {
