@@ -23,14 +23,13 @@ export async function startTimer(req: Request, res: Response) {
     const { taskId } = req.body;
     if (!taskId) return res.status(400).json({ error: "taskId is required" });
 
-    // すでに稼働中なら拒否
-    const running = await queries.getCurrentTimerSession(userId);
-    if (running) return res.status(409).json({ error: "Timer already running" });
-
     const session = await queries.startTimerSession(userId, taskId);
     return res.status(201).json(session);
-  } catch (error) {
-    console.error("Error starting timer:", error);
+  } catch (e: any) {
+    if (e?.message === "A timer session is already running") {
+      return res.status(409).json({ error: e.message });
+    }
+    console.error("Error starting timer:", e);
     return res.status(500).json({ error: "Failed to start timer" });
   }
 }
