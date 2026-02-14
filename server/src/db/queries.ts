@@ -123,13 +123,14 @@ export const startTimerSession = async (userId: string, taskId: string) => {
    if (existing) {
      throw new Error("A timer session is already running");
    }
-  return db.insert(timerSessions)
+  const [session] = await db.insert(timerSessions)
     .values({
       userId,
       taskId,
       startedAt: new Date(),
     })
     .returning();
+    return session;
 };
 
 export const stopCurrentTimerSession = async (userId: string, durationSec: number) => {
