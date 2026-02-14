@@ -31,7 +31,7 @@ export const getMyProjects = async (req: Request, res: Response) => {
 // Get project by id (public)
 export const getProjectById = async (req: Request, res: Response) => {
   try {
-    const { id} = req.params;
+    const { id } = req.params;
     const project = await queries.getProjectById(String(id));
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
