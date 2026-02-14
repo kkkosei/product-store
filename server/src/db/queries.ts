@@ -119,6 +119,10 @@ export const getCurrentTimerSession = async (userId: string) => {
 };
 
 export const startTimerSession = async (userId: string, taskId: string) => {
+  const existing = await getCurrentTimerSession(userId);
+   if (existing) {
+     throw new Error("A timer session is already running");
+   }
   return db.insert(timerSessions)
     .values({
       userId,
@@ -134,6 +138,9 @@ export const stopCurrentTimerSession = async (userId: string, durationSec: numbe
     .set({ endedAt: now, durationSec, updatedAt: now })
     .where(and(eq(timerSessions.userId, userId), isNull(timerSessions.endedAt)))
     .returning();
+  if (!session) {
+    throw new Error("No active timer session to stop");
+  }
   return session;
 };
 
