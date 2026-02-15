@@ -2,6 +2,11 @@ import type { Request, Response } from "express";
 import { getAuth } from "@clerk/express";
 import * as queries from "../db/queries";
 
+/**
+ * Retrieve the current timer session for the authenticated user.
+ *
+ * @returns The current timer session object when found; otherwise an error object with an `error` message (e.g., for unauthorized access or internal failure).
+ */
 export async function getCurrentTimer(req: Request, res: Response) {
   try {
     const { userId } = getAuth(req);
@@ -15,6 +20,15 @@ export async function getCurrentTimer(req: Request, res: Response) {
   }
 }
 
+/**
+ * Start a new timer session for the authenticated user on the specified task.
+ *
+ * Validates authentication and `taskId` in the request body. Responds with:
+ * - 401 if the user is not authenticated,
+ * - 400 if `taskId` is missing,
+ * - 409 if a timer session is already running,
+ * - 500 for other errors.
+ */
 export async function startTimer(req: Request, res: Response) {
   try {
     const { userId } = getAuth(req);
@@ -32,6 +46,11 @@ export async function startTimer(req: Request, res: Response) {
   }
 }
 
+/**
+ * Stops the authenticated user's currently running timer and responds with the stopped session.
+ *
+ * @returns The HTTP response containing the stopped timer session data on success; on error it returns JSON with an appropriate status code (`401` if unauthenticated, `409` if no running timer, `500` for server errors).
+ */
 export async function stopTimer(req: Request, res: Response) {
   try {
     const { userId } = getAuth(req);
