@@ -10,6 +10,9 @@ function ProjectSelect({ projects, projectId, onChange }) {
             value={projectId}
             onChange={(e) => onChange(e.target.value)}
           >
+            <option value="" disabled>
+              Select a project
+            </option>
             {projects?.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.title}
