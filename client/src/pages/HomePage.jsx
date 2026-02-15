@@ -42,7 +42,7 @@ function HomePage() {
                 Start Studying
               </button>
             </SignInButton>
-            <Link to="/project" className="btn btn-primary">
+            <Link to="/timer" className="btn btn-primary">
               timer & task
             </Link> 
           </div>
