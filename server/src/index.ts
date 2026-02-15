@@ -46,7 +46,7 @@ if(ENV.NODE_ENV == "production"){
   app.use(Express.static(clientDist));
 
   // handle SPA routing - send all non-API routes to index.html - react app
-  app.get("*", (req, res) => {
+  app.get("/{*any}", (req, res) => {
     res.sendFile(path.join(clientDist, "index.html"));
   });
 }
