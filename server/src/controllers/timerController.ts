@@ -23,6 +23,9 @@ export async function startTimer(req: Request, res: Response) {
     const { taskId } = req.body;
     if (!taskId) return res.status(400).json({ error: "taskId is required" });
 
+    const session = await queries.startTimerSession(userId, taskId);
+    return res.status(201).json(session);
+
   } catch (e: any) {
     if (e?.message === "A timer session is already running") {
       return res.status(409).json({ error: e.message });
