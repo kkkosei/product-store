@@ -29,7 +29,19 @@ function TimerPage() {
     return "";
   }, [runningProjectId, selectedProjectId, projectsQ.data]);
 
-  const tasksQ = useTasks(effectiveProjectId);
+  const tasks = useTasks(effectiveProjectId);
+  const tasksQ = tasks.tasksQ;
+
+  const handleCreateTask = (title) => {
+  return tasks.create.mutateAsync(title);
+  };
+
+  const handleArchiveTask = async (taskId) => {
+    const result = await tasks.archive.mutateAsync(taskId);
+    if (!result) return;
+    if (selectedTaskId === taskId) setSelectedTaskId("");
+  };
+
 
   const effectiveTaskId = useMemo(() => {
     if (runningTaskId) return runningTaskId;
@@ -65,7 +77,10 @@ function TimerPage() {
           tasksQ={tasksQ}
           selectedTaskId={effectiveTaskId}
           runningTaskId={runningTaskId}
-          onSelectTask={(id) => setSelectedTaskId(id)}
+          onSelectTask={setSelectedTaskId}
+          onCreateTask={handleCreateTask}
+          creatingTask={tasks.create.isPending}
+          onArchiveTask={handleArchiveTask}
         />
 
         <div className="card bg-base-300 lg:col-span-2">

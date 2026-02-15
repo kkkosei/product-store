@@ -43,6 +43,16 @@ export const getTasksByProject = async (projectId) => {
   return data;
 };
 
+export const createTask = async ({ projectId, title }) => {
+  const { data } = await api.post(`/projects/${projectId}/tasks`, { title });
+  return data;
+};
+
+export const archiveTask = async ({ taskId }) => {
+  const { data } = await api.patch(`/tasks/${taskId}/archive`);
+  return data; // task | null
+};
+
 // timer api
 export const getCurrentTimer = async () => {
   const { data } = await api.get("/timer/current");
