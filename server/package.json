@@ -22,7 +22,7 @@
     "drizzle-orm": "^0.44.7",
     "express": "^5.2.1",
     "pg": "^8.16.3",
-    "product_store": "file:.."
+    "study-log": "file:.."
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
