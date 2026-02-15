@@ -106,7 +106,7 @@ function TaskList({
                       <button
                         type="button"
                         className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
-                        onClick={() => onArchiveTask(t.id)}
+                        onClick={() => { onArchiveTask(t.id).catch(() => {}); }}
                         disabled={isRunningTask}
                         title={isRunningTask ? "Stop timer first" : "Archive task"}
                       >
