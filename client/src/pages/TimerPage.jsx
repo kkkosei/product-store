@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useProjects } from "../hooks/useProjects";
 import { useTasks } from "../hooks/useTasks";
@@ -10,62 +10,62 @@ import TimerStats from "../components/timer/TimerStats";
 import TimerControls from "../components/timer/TimerControls";
 
 function TimerPage() {
-  const [projectId, setProjectId] = useState("");
-  const [taskId, setTaskId] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedTaskId, setSelectedTaskId] = useState("");
 
   const projectsQ = useProjects();
-  const tasksQ = useTasks(projectId);
   const timer = useTimer();
 
-  const runningSession = timer.current.data || null;
+  const runningSession = timer.current.data ?? null;
   const running = !!runningSession;
 
-  const runningTaskId = timer.current.data?.task?.id ?? "";
-  const runningProjectId = timer.current.data?.task?.projectId ?? "";
+  const runningTaskId = runningSession?.task?.id ?? "";
+  const runningProjectId = runningSession?.task?.projectId ?? "";
+  
+  const effectiveProjectId = useMemo(() => {
+    if (runningProjectId) return runningProjectId;
+    if (selectedProjectId) return selectedProjectId;
+    if (projectsQ.data?.length) return projectsQ.data[0].id;
+    return "";
+  }, [runningProjectId, selectedProjectId, projectsQ.data]);
 
-  // On initial load, if no active session exists, select the first project once projects are loaded
-  useEffect(() => {
-    if (runningTaskId) return;
-    if (!projectsQ.data?.length) return;
-    setProjectId((prev) => (prev ? prev : projectsQ.data[0].id));
-  }, [projectsQ.data, runningTaskId]);
+  const tasksQ = useTasks(effectiveProjectId);
 
-  // On initial load, automatically select the task → project from the active timer session (highest priority)
-  useEffect(() => {
-    if (!runningTaskId || !runningProjectId) return;
-    setProjectId((prev) => (prev === runningProjectId ? prev : runningProjectId));
-    setTaskId((prev) => (prev === runningTaskId ? prev : runningTaskId));
-  }, [runningTaskId, runningProjectId]);
+  const effectiveTaskId = useMemo(() => {
+    if (runningTaskId) return runningTaskId;
+    return selectedTaskId;
+  }, [runningTaskId, selectedTaskId]);
 
-  const canStart = !!taskId && !running && !timer.start.isPending;
+  const canStart = !!effectiveTaskId && !running && !timer.start.isPending;
   const canStop = running && !timer.stop.isPending;
 
   const selectedTaskTitle = useMemo(() => {
     if (!tasksQ.data?.length) return null;
-    const t = tasksQ.data.find((t) => t.id === taskId);
+    const t = tasksQ.data.find((t) => t.id === effectiveTaskId);
     return t?.title ?? null;
-  }, [tasksQ.data, taskId]);
+  }, [tasksQ.data, effectiveTaskId]);
 
   if (projectsQ.isLoading) return <LoadingSpinner />;
-  if (projectsQ.error) return <div className="alert alert-error">Failed to load projects</div>;
+  if (projectsQ.error)
+    return <div className="alert alert-error">Failed to load projects</div>;
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
       <ProjectSelect
         projects={projectsQ.data}
-        projectId={projectId}
+        projectId={effectiveProjectId}
         onChange={(newProjectId) => {
-          setProjectId(newProjectId);
-          setTaskId("");
+          setSelectedProjectId(newProjectId);
+          setSelectedTaskId("");
         }}
       />
 
       <div className="grid lg:grid-cols-3 gap-4">
         <TaskList
           tasksQ={tasksQ}
-          selectedTaskId={taskId}
+          selectedTaskId={effectiveTaskId}
           runningTaskId={runningTaskId}
-          onSelectTask={(id) => setTaskId(id)}
+          onSelectTask={(id) => setSelectedTaskId(id)}
         />
 
         <div className="card bg-base-300 lg:col-span-2">
@@ -77,9 +77,12 @@ function TimerPage() {
               )}
             </div>
 
-            <TimerStats running={running} selectedTaskTitle={selectedTaskTitle} />
+            <TimerStats
+              running={running}
+              selectedTaskTitle={selectedTaskTitle}
+            />
 
-            {!taskId && (
+            {!effectiveTaskId && (
               <div className="alert alert-info">
                 Select a task from the left to start.
               </div>
@@ -88,7 +91,7 @@ function TimerPage() {
             <TimerControls
               canStart={canStart}
               canStop={canStop}
-              onStart={() => timer.start.mutate(taskId)}
+              onStart={() => timer.start.mutate(effectiveTaskId)}
               onStop={() => timer.stop.mutate()}
               isStarting={timer.start.isPending}
               isStopping={timer.stop.isPending}
