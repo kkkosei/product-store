@@ -120,17 +120,14 @@ export const archiveTask = async (id: string, userId: string) => {
   const existing = await db.query.tasks.findFirst({
     where: and(eq(tasks.id, id), eq(tasks.userId, userId)),
   });
-
   if (!existing) {
-    throw new Error("Task not found");
+    return null;
   }
-
   const [task] = await db
     .update(tasks)
     .set({ status: "archived" })
     .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
     .returning();
-
   return task;
 };
 

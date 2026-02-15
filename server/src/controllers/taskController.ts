@@ -38,6 +38,11 @@ export async function postTaskToProject(req: Request, res: Response) {
     const { projectId } = req.params;
     const { title } = req.body;
 
+    const project = await queries.getProjectById(String(projectId));
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
     if (!title || typeof title !== "string" || !title.trim()) {
       return res.status(400).json({ error: "Title is required" });
     }
