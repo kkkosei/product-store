@@ -110,6 +110,27 @@ export const getTasksByProjectId = async (projectId: string, userId: string) => 
   });
 };
 
+// Task Queries
+export const createTask = async (data: NewTask) => {
+  const [task] = await db.insert(tasks).values(data).returning();
+  return task;
+};
+
+export const archiveTask = async (id: string, userId: string) => {
+  const existing = await db.query.tasks.findFirst({
+    where: and(eq(tasks.id, id), eq(tasks.userId, userId)),
+  });
+  if (!existing) {
+    return null;
+  }
+  const [task] = await db
+    .update(tasks)
+    .set({ status: "archived" })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning();
+  return task;
+};
+
 // Timer Queries
 export const getCurrentTimerSession = async (userId: string) => {
   return db.query.timerSessions.findFirst({

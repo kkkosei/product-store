@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useProjects } from "../hooks/useProjects";
+import { useMyProjects } from "../hooks/useProjects";
 import { useTasks } from "../hooks/useTasks";
 import { useTimer } from "../hooks/useTimer";
 
@@ -13,7 +13,7 @@ function TimerPage() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedTaskId, setSelectedTaskId] = useState("");
 
-  const projectsQ = useProjects();
+  const projectsQ = useMyProjects();
   const timer = useTimer();
 
   const runningSession = timer.current.data ?? null;
@@ -29,7 +29,19 @@ function TimerPage() {
     return "";
   }, [runningProjectId, selectedProjectId, projectsQ.data]);
 
-  const tasksQ = useTasks(effectiveProjectId);
+  const tasks = useTasks(effectiveProjectId);
+  const tasksQ = tasks.tasksQ;
+
+  const handleCreateTask = (title) => {
+  return tasks.create.mutateAsync(title);
+  };
+
+  const handleArchiveTask = async (taskId) => {
+    const result = await tasks.archive.mutateAsync(taskId);
+    if (!result) return;
+    if (selectedTaskId === taskId) setSelectedTaskId("");
+  };
+
 
   const effectiveTaskId = useMemo(() => {
     if (runningTaskId) return runningTaskId;
@@ -65,7 +77,10 @@ function TimerPage() {
           tasksQ={tasksQ}
           selectedTaskId={effectiveTaskId}
           runningTaskId={runningTaskId}
-          onSelectTask={(id) => setSelectedTaskId(id)}
+          onSelectTask={setSelectedTaskId}
+          onCreateTask={handleCreateTask}
+          creatingTask={tasks.create.isPending}
+          onArchiveTask={handleArchiveTask}
         />
 
         <div className="card bg-base-300 lg:col-span-2">
@@ -83,7 +98,7 @@ function TimerPage() {
             />
 
             {!effectiveTaskId && (
-              <div className="alert alert-info">
+              <div className="alert alert-warning">
                 Select a task from the left to start.
               </div>
             )}
