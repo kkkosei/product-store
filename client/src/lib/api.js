@@ -37,6 +37,28 @@ export const deleteProject = async (id) => {
   return data;
 };
 
+// tasks api
+export const getTasksByProject = async (projectId) => {
+  const { data } = await api.get(`/projects/${projectId}/tasks`);
+  return data;
+};
+
+// timer api
+export const getCurrentTimer = async () => {
+  const { data } = await api.get("/timer/current");
+  return data; // null | session
+};
+
+export const startTimer = async (taskId) => {
+  const { data } = await api.post("/timer/start", { taskId });
+  return data;
+};
+
+export const stopTimer = async () => {
+  const { data } = await api.post("/timer/stop");
+  return data;
+};
+
 //comments api
 export const createComment = async ({projectId, content}) => {
   const {data} = await api.post(`/comments/${projectId}`, {content});
