@@ -37,7 +37,12 @@ function TaskList({
             <button
               type="button"
               className="btn btn-ghost btn-xs"
-              onClick={() => setIsAdding((v) => !v)}
+              onClick={() => {
+                setIsAdding((prev) => {
+                 if (prev) setTitle("");
+                 return !prev;
+                });
+              }}
               title="Add task"
             >
               +

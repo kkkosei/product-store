@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useProjects } from "../hooks/useProjects";
+import { useMyProjects } from "../hooks/useProjects";
 import { useTasks } from "../hooks/useTasks";
 import { useTimer } from "../hooks/useTimer";
 
@@ -13,7 +13,7 @@ function TimerPage() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedTaskId, setSelectedTaskId] = useState("");
 
-  const projectsQ = useProjects();
+  const projectsQ = useMyProjects();
   const timer = useTimer();
 
   const runningSession = timer.current.data ?? null;
@@ -98,7 +98,7 @@ function TimerPage() {
             />
 
             {!effectiveTaskId && (
-              <div className="alert alert-info">
+              <div className="alert alert-warning">
                 Select a task from the left to start.
               </div>
             )}
