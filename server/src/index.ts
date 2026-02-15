@@ -28,7 +28,8 @@ app.get("/api/health", (req, res) => {
     endpoints: {
       users: "/api/users",
       projects: "/api/projects",
-      comments: "/api/comments"},
+      comments: "/api/comments",
+      timer: "/api/timer"},
   });
 });
 
