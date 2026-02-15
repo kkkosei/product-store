@@ -4,6 +4,8 @@ import CommentsSection from "../components/CommentsSection";
 import { useAuth } from "@clerk/clerk-react";
 import { useProject, useDeleteProject } from "../hooks/useProjects";
 import { useParams, Link, useNavigate } from "react-router";
+import { useProjectSummary } from "../hooks/useProjectSummary";
+import { formatDuration } from "../lib/format";
 
 function ProjectPage() {
   const { id } = useParams();
@@ -12,6 +14,7 @@ function ProjectPage() {
 
   const { data: project, isLoading, error } = useProject(id);
   const deleteProject = useDeleteProject();
+  const summaryQ = useProjectSummary(id);
 
   const handleDelete = () => {
     if (confirm("Delete this project permanently?")) {
@@ -113,6 +116,18 @@ function ProjectPage() {
           </div>
         </div>
       </div>
+
+      <div className="stats bg-base-200 my-4">
+        <div className="stat">
+          <div className="stat-title">Total Study Time</div>
+          <div className="stat-value text-primary">
+            {summaryQ.isLoading
+              ? "..."
+              : formatDuration(summaryQ.data?.totalSeconds)}
+          </div>
+        </div>
+      </div>
+
 
       {/* Comments */}
       <div className="card bg-base-300">

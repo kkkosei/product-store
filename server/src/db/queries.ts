@@ -1,5 +1,5 @@
 import { db } from "./index"
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { 
   users,
   projects, 
@@ -102,6 +102,18 @@ export const deleteProject = async (id: string) => {
   return project;
 };
 
+export const getProjectTotalTime = async (projectId: string, userId: string) => {
+  const result = await db
+    .select({
+      total: sql<number>`coalesce(sum(${timerSessions.durationSec}), 0)`,
+    })
+    .from(timerSessions)
+    .innerJoin(tasks, eq(timerSessions.taskId, tasks.id))
+    .where(and(eq(tasks.projectId, projectId), eq(timerSessions.userId, userId)));
+
+  return result[0]?.total ?? 0;
+};
+
 // Task Queries
 export const getTasksByProjectId = async (projectId: string, userId: string) => {
   return db.query.tasks.findMany({
@@ -110,7 +122,6 @@ export const getTasksByProjectId = async (projectId: string, userId: string) => 
   });
 };
 
-// Task Queries
 export const createTask = async (data: NewTask) => {
   const [task] = await db.insert(tasks).values(data).returning();
   return task;
@@ -191,6 +202,4 @@ export const deleteComment = async (id: string) => {
   const [comment] = await db.delete(comments).where(eq(comments.id, id)).returning();
   return comment;
 };
-
-
 
