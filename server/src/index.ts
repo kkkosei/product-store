@@ -8,6 +8,8 @@ import { clerkMiddleware } from '@clerk/express'
 import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import timerRoutes from "./routes/timerRoutes";
+import taskRoutes from "./routes/taskRoutes";
 
 const app = Express();
 
@@ -26,12 +28,15 @@ app.get("/api/health", (req, res) => {
     endpoints: {
       users: "/api/users",
       projects: "/api/projects",
-      comments: "/api/comments"},
+      comments: "/api/comments",
+      timer: "/api/timer"},
   });
 });
 
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/timer", timerRoutes);
+app.use("/api/projects", taskRoutes);
 app.use("/api/comments", commentRoutes);
 
 if(ENV.NODE_ENV == "production"){
