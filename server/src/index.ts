@@ -8,6 +8,8 @@ import { clerkMiddleware } from '@clerk/express'
 import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import timerRoutes from "./routes/timerRoutes";
+import taskRoutes from "./routes/taskRoutes";
 
 const app = Express();
 
@@ -32,6 +34,8 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/timer", timerRoutes);
+app.use("/api/projects", taskRoutes);
 app.use("/api/comments", commentRoutes);
 
 if(ENV.NODE_ENV == "production"){
@@ -42,7 +46,7 @@ if(ENV.NODE_ENV == "production"){
   app.use(Express.static(clientDist));
 
   // handle SPA routing - send all non-API routes to index.html - react app
-  app.get("/{*any}", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.join(clientDist, "index.html"));
   });
 }
