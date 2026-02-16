@@ -11,10 +11,9 @@ export const taskRouter = Router();
 
 // /api/tasks/:taskId/archive
 taskRouter.patch("/:taskId/archive", archiveTaskController);
-// /api/tasks/:taskId
-taskRouter.delete("/:taskId", deleteTaskController);
 // /api/tasks/archived/all
 taskRouter.delete("/archived/all", deleteArchivedTasksController);
-
+// /api/tasks/:taskId
+taskRouter.delete("/:taskId", deleteTaskController);
 
 export default router;
