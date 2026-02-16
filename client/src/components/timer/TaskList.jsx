@@ -102,9 +102,13 @@ function TaskList({
                     <div className="flex items-center gap-2 shrink-0">
                       {isRunningTask ? (
                         <span className="badge badge-success whitespace-nowrap">running</span>
+                      ) : t.status === "archived" ? (
+                        <span className="badge badge-outline badge-success whitespace-nowrap">
+                          archived
+                        </span>
                       ) : (
-                        <span className="badge badge-ghost whitespace-nowrap">
-                          {t.status ?? "todo"}
+                        <span className="badge badge-outline badge-secondary whitespace-nowrap">
+                          todo
                         </span>
                       )}
 

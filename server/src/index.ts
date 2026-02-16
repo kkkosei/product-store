@@ -9,7 +9,7 @@ import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import timerRoutes from "./routes/timerRoutes";
-import taskRoutes from "./routes/taskRoutes";
+import projectTaskRoutes, { taskRouter } from "./routes/taskRoutes";
 
 const app = Express();
 
@@ -36,7 +36,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/timer", timerRoutes);
-app.use("/api/projects", taskRoutes);
+app.use("/api/projects", projectTaskRoutes);
+app.use("/api/tasks", taskRouter);
 app.use("/api/comments", commentRoutes);
 
 if(ENV.NODE_ENV == "production"){

@@ -142,6 +142,29 @@ export const archiveTask = async (id: string, userId: string) => {
   return task;
 };
 
+export const deleteTaskById = async (id: string, userId: string) => {
+  const existing = await db.query.tasks.findFirst({
+    where: and(eq(tasks.id, id), eq(tasks.userId, userId)),
+  });
+  if (!existing) return null;
+
+  const [deleted] = await db
+    .delete(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning();
+
+  return deleted ?? null;
+};
+
+export const deleteAllArchivedTasks = async (userId: string) => {
+  const deleted = await db
+    .delete(tasks)
+    .where(and(eq(tasks.userId, userId), eq(tasks.status, "archived")))
+    .returning({ id: tasks.id });
+
+  return { deletedCount: deleted.length };
+};
+
 // Timer Queries
 export const getCurrentTimerSession = async (userId: string) => {
   return db.query.timerSessions.findFirst({
