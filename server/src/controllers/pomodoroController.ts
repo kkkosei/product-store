@@ -38,6 +38,16 @@ export async function patchPomodoroSettings(req: Request, res: Response) {
       }
     }
 
+    const numericKeys = ["workSec", "breakSec", "longBreakSec", "longBreakEvery"];
+    for (const k of numericKeys) {
+      if (k in data && (!Number.isInteger(data[k]) || data[k] <= 0)) {
+        return res.status(400).json({ error: `${k} must be a positive integer` });
+      }
+    }
+    if ("autoStartNext" in data && typeof data.autoStartNext !== "boolean") {
+      return res.status(400).json({ error: "autoStartNext must be a boolean" });
+    }    
+
     const updated = await pomodoroService.updateSettings(userId, data);
     return res.status(200).json(updated);
   } catch (e) {

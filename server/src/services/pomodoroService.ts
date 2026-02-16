@@ -26,7 +26,14 @@ function clamp(n: number, min: number, max: number) {
 async function ensureSettings(userId: string) {
   const existing = await queries.getPomodoroSettingsByUserId(userId);
   if (existing) return existing;
-  return queries.createPomodoroSettings(userId);
+  try {
+    return await queries.createPomodoroSettings(userId);
+  } catch {
+    // Another request may have inserted concurrently
+    const retry = await queries.getPomodoroSettingsByUserId(userId);
+    if (retry) return retry;
+    throw new Error("Failed to initialize pomodoro settings");
+  }
 }
 
 async function ensureState(userId: string) {
@@ -55,6 +62,9 @@ export async function updateSettings(
     autoStartNext: boolean;
   }>
 ) {
+  if (data.longBreakEvery !== undefined && data.longBreakEvery < 1) {
+    throw new Error("longBreakEvery must be at least 1");
+  }
   await ensureSettings(userId);
   const updated = await queries.updatePomodoroSettingsByUserId(userId, data);
   if (!updated) throw new Error("Failed to update settings");
