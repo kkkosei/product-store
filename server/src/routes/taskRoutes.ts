@@ -3,8 +3,13 @@ import { getTasksByProject, postTaskToProject, archiveTaskController } from "../
 
 const router = Router();
 
+// /api/projects/:projectId/tasks
 router.get("/:projectId/tasks", getTasksByProject);
 router.post("/:projectId/tasks", postTaskToProject);
-router.patch("/tasks/:taskId/archive", archiveTaskController);
+
+export const taskRouter = Router();
+
+// /api/tasks/:taskId/archive
+taskRouter.patch("/:taskId/archive", archiveTaskController);
 
 export default router;
