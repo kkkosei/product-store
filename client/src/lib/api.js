@@ -37,6 +37,11 @@ export const deleteProject = async (id) => {
   return data;
 };
 
+export const getProjectSummary = async (projectId) => {
+  const { data } = await api.get(`/projects/${projectId}/summary`);
+  return data; // { totalSeconds }
+};
+
 // tasks api
 export const getTasksByProject = async (projectId) => {
   const { data } = await api.get(`/projects/${projectId}/tasks`);

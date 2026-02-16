@@ -22,5 +22,8 @@ router.put("/:id", requireAuth(), projectController.updateProject);
 // DELETE /api/projects/:id => delete a project (private - owner only)
 router.delete("/:id", requireAuth(), projectController.deleteProject);
 
+// GET /api/projects/:id/summary => get a total seconds by project 
+router.get("/:id/summary", requireAuth(), projectController.getProjectSummary);
+
 
 export default router;

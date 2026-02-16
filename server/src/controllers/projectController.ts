@@ -119,3 +119,18 @@ export const deleteProject = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to delete project" });
   }
 };
+
+export async function getProjectSummary(req: Request, res: Response) {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const { id } = req.params;
+    const totalSeconds = await queries.getProjectTotalTime(String(id), userId);
+
+    return res.status(200).json({ totalSeconds });
+  } catch (e) {
+    console.error("Error getting project summary:", e);
+    return res.status(500).json({ error: "Failed to get project summary" });
+  }
+}
