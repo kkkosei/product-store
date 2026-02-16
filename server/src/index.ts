@@ -10,6 +10,7 @@ import projectRoutes from "./routes/projectRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import timerRoutes from "./routes/timerRoutes";
 import projectTaskRoutes, { taskRouter } from "./routes/taskRoutes";
+import pomodoroRoutes from "./routes/pomodoroRoutes";
 
 const app = Express();
 
@@ -39,6 +40,7 @@ app.use("/api/timer", timerRoutes);
 app.use("/api/projects", projectTaskRoutes);
 app.use("/api/tasks", taskRouter);
 app.use("/api/comments", commentRoutes);
+app.use("/api/pomodoro", pomodoroRoutes);
 
 if(ENV.NODE_ENV == "production"){
   const __dirname = path.resolve();

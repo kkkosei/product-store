@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer  } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, integer, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 
@@ -81,13 +81,60 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const pomodoroState = pgTable("pomodoro_state", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  phase: text("phase").notNull().default("work"), 
+  // "work" | "break" | "longbreak"
+
+  status: text("status").notNull().default("idle"), 
+  // "idle" | "running" | "paused"
+
+  taskId: uuid("task_id").references(() => tasks.id, { onDelete: "set null" }),
+
+  startedAt: timestamp("started_at", { mode: "date" }),
+  endsAt: timestamp("ends_at", { mode: "date" }),
+
+  cycleCount: integer("cycle_count").notNull().default(0),
+
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const pomodoroSettings = pgTable("pomodoro_settings", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  workSec: integer("work_sec").notNull().default(25 * 60),
+  breakSec: integer("break_sec").notNull().default(5 * 60),
+  longBreakSec: integer("long_break_sec").notNull().default(15 * 60),
+
+  longBreakEvery: integer("long_break_every").notNull().default(5),
+
+  autoStartNext: boolean("auto_start_next").notNull().default(false),
+
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 
 // Define relations
-export const userRelations = relations(users, ({ many }) => ({
+export const userRelations = relations(users, ({ one, many }) => ({
   projects: many(projects),
   comments: many(comments),
   tasks: many(tasks),
   timerSessions: many(timerSessions),
+  pomodoroSettings: one(pomodoroSettings),
+  pomodoroState: one(pomodoroState),
 }));
 
 export const projectRelations = relations(projects, ({ one, many }) => ({
@@ -109,6 +156,7 @@ export const taskRelations = relations(tasks, ({ one, many }) => ({
     references: [projects.id],
   }),
   timerSessions: many(timerSessions),
+  pomodoroState: one(pomodoroState),
 }));
 
 export const timerSessionsRelations = relations(timerSessions, ({ one }) => ({
@@ -127,6 +175,25 @@ export const commentsRelations = relations(comments, ({ one}) => ({
   project: one(projects, { fields: [comments.projectId], references: [projects.id] }),
 }));
 
+export const pomodoroSettingsRelations = relations(pomodoroSettings, ({ one }) => ({
+  user: one(users, {
+    fields: [pomodoroSettings.userId],
+    references: [users.id],
+  }),
+}));
+
+export const pomodoroStateRelations = relations(pomodoroState, ({ one }) => ({
+  user: one(users, {
+    fields: [pomodoroState.userId],
+    references: [users.id],
+  }),
+  task: one(tasks, {
+    fields: [pomodoroState.taskId],
+    references: [tasks.id],
+  }),
+}));
+
+
 //Type inferences
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -142,3 +209,9 @@ export type NewTimerSession = typeof timerSessions.$inferInsert;
 
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
+
+export type PomodoroSettings = typeof pomodoroSettings.$inferSelect;
+export type NewPomodoroSettings = typeof pomodoroSettings.$inferInsert;
+
+export type PomodoroState = typeof pomodoroState.$inferSelect;
+export type NewPomodoroState = typeof pomodoroState.$inferInsert;
