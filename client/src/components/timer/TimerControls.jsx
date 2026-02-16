@@ -25,7 +25,7 @@ function TimerControls({
         Resume
       </button>
 
-      <button className="btn btn-outline" disabled={isCompleting} onClick={onComplete}>
+       <button className="btn btn-outline" disabled={!onComplete || isCompleting} onClick={onComplete}>
         Complete
       </button>
     </div>

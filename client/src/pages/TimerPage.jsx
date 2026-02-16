@@ -21,6 +21,14 @@ function TimerPage() {
   const running = pState?.status === "running";
   const runningTaskId = pState?.taskId ?? "";
 
+  // Force re-render every second while running for smooth countdown
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [running]);
+
 
   const baseProjectId = useMemo(() => {
     if (selectedProjectId) return selectedProjectId;
