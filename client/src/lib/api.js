@@ -58,6 +58,16 @@ export const archiveTask = async ({ taskId }) => {
   return data; // task | null
 };
 
+export const deleteTask = async ({ taskId }) => {
+  const { data } = await api.delete(`/tasks/${taskId}`);
+  return data; // { ok: true, deletedTaskId }
+};
+
+export const deleteArchivedTasksAll = async () => {
+  const { data } = await api.delete(`/tasks/archived/all`);
+  return data; // { ok: true, deletedCount }
+};
+
 // timer api
 export const getCurrentTimer = async () => {
   const { data } = await api.get("/timer/current");
