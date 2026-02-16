@@ -10,7 +10,9 @@ import {
   type NewProject, 
   type NewTask,
   type NewTimerSession,
-  type NewComment 
+  type NewComment, 
+  pomodoroSettings,
+  pomodoroState
 } from "./schema"
 
 
@@ -200,9 +202,6 @@ export const stopCurrentTimerSession = async (userId: string, durationSec: numbe
   return session;
 };
 
-
-
-
 // Comment Queries
 export const createComment = async (data: NewComment) => {
   const [comment] = await db.insert(comments).values(data).returning();
@@ -226,3 +225,84 @@ export const deleteComment = async (id: string) => {
   return comment;
 };
 
+// PomodoroSettings (DB only)
+export const getPomodoroSettingsByUserId = async (userId: string) => {
+  return db.query.pomodoroSettings.findFirst({
+    where: eq(pomodoroSettings.userId, userId),
+  });
+};
+
+export const createPomodoroSettings = async (userId: string) => {
+  const [created] = await db.insert(pomodoroSettings).values({ userId }).returning();
+  return created;
+};
+
+export const updatePomodoroSettingsByUserId = async (
+  userId: string,
+  data: Partial<{
+    workSec: number;
+    breakSec: number;
+    longBreakSec: number;
+    longBreakEvery: number;
+    autoStartNext: boolean;
+  }>
+) => {
+  const [updated] = await db
+    .update(pomodoroSettings)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(pomodoroSettings.userId, userId))
+    .returning();
+
+  return updated ?? null;
+};
+
+// PomodoroState (DB only)
+export const getPomodoroStateByUserId = async (userId: string) => {
+  return db.query.pomodoroState.findFirst({
+    where: eq(pomodoroState.userId, userId),
+    with: { task: true },
+  });
+};
+
+export const createPomodoroState = async (userId: string) => {
+  const [created] = await db.insert(pomodoroState).values({ userId }).returning();
+  return created;
+};
+
+export const updatePomodoroStateByUserId = async (
+  userId: string,
+  data: Partial<{
+    phase: "work" | "break" | "longbreak";
+    status: "idle" | "running" | "paused";
+    taskId: string | null;
+    startedAt: Date | null;
+    endsAt: Date | null;
+    cycleCount: number;
+  }>
+) => {
+  const [updated] = await db
+    .update(pomodoroState)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(pomodoroState.userId, userId))
+    .returning();
+
+  return updated ?? null;
+};
+
+// TimerSessions (DB only) - work完了や手動切替の部分保存で使う
+export const insertTimerSession = async (data: {
+  userId: string;
+  taskId: string;
+  startedAt: Date;
+  endedAt: Date;
+  durationSec: number;
+}) => {
+  const [created] = await db.insert(timerSessions).values(data).returning();
+  return created;
+};
+
+export const getTaskOwnedByUser = async (taskId: string, userId: string) => {
+  return db.query.tasks.findFirst({
+    where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
+  });
+};
