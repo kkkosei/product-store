@@ -65,6 +65,11 @@ export async function updateSettings(
   if (data.longBreakEvery !== undefined && data.longBreakEvery < 1) {
     throw new Error("longBreakEvery must be at least 1");
   }
+  for (const key of ["workSec", "breakSec", "longBreakSec"] as const) {
+    if (data[key] !== undefined && data[key]! < 1) {
+      throw new Error(`${key} must be at least 1`);
+    }
+  }
   await ensureSettings(userId);
   const updated = await queries.updatePomodoroSettingsByUserId(userId, data);
   if (!updated) throw new Error("Failed to update settings");
