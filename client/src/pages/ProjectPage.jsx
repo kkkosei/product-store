@@ -117,16 +117,18 @@ function ProjectPage() {
         </div>
       </div>
 
-      <div className="stats bg-base-200 my-4">
-        <div className="stat">
-          <div className="stat-title">Total Study Time</div>
-          <div className="stat-value text-primary">
-            {summaryQ.isLoading
-              ? "..."
-              : formatDuration(summaryQ.data?.totalSeconds)}
+      {isOwner && (
+        <div className="stats bg-base-200 my-4">
+          <div className="stat">
+            <div className="stat-title">Total Study Time</div>
+            <div className="stat-value text-primary">
+              {summaryQ.isLoading
+                ? "..."
+                : formatDuration(summaryQ.data?.totalSeconds)}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
 
       {/* Comments */}

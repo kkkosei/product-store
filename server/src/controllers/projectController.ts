@@ -125,8 +125,8 @@ export async function getProjectSummary(req: Request, res: Response) {
     const { userId } = getAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    const { projectId } = req.params;
-    const totalSeconds = await queries.getProjectTotalTime(String(projectId), userId);
+    const { id } = req.params;
+    const totalSeconds = await queries.getProjectTotalTime(String(id), userId);
 
     return res.status(200).json({ totalSeconds });
   } catch (e) {
