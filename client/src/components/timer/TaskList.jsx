@@ -10,9 +10,15 @@ function TaskList({
   onCreateTask,
   creatingTask,
   onArchiveTask,
+
+  onDeleteTask,
+  deletingTask,
+  onDeleteArchivedAll,
+  deletingArchivedAll,
 }) {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
+  const hasArchived = (tasksQ.data ?? []).some((t) => t.status === "archived");
 
   const submit = async () => {
     const v = title.trim();
@@ -47,6 +53,18 @@ function TaskList({
             >
               +
             </button>
+
+            {hasArchived && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-xs"
+                onClick={() => { onDeleteArchivedAll?.().catch(() => {}); }}
+                disabled={deletingArchivedAll || tasksQ.isFetching}
+                title="Delete all archived tasks"
+              >
+                Delete all archived tasks
+              </button>
+            )}
           </div>
         </div>
 
@@ -112,14 +130,26 @@ function TaskList({
                         </span>
                       )}
 
+                      {t.status !== "archived" && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
+                          onClick={() => { onArchiveTask(t.id).catch(() => {}); }}
+                          disabled={isRunningTask}
+                          title={isRunningTask ? "Stop timer first" : "Archive task"}
+                        >
+                          complete
+                        </button>
+                      )}
+
                       <button
                         type="button"
                         className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
-                        onClick={() => { onArchiveTask(t.id).catch(() => {}); }}
-                        disabled={isRunningTask}
-                        title={isRunningTask ? "Stop timer first" : "Archive task"}
+                        onClick={() => { onDeleteTask?.(t.id).catch(() => {}); }}
+                        disabled={isRunningTask || deletingTask}
+                        title={isRunningTask ? "Stop timer first" : "Delete task"}
                       >
-                        complete
+                        delete
                       </button>
                     </div>
                   </div>

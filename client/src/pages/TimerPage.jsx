@@ -42,6 +42,23 @@ function TimerPage() {
     if (selectedTaskId === taskId) setSelectedTaskId("");
   };
 
+  const handleDeleteTask = async (taskId) => {
+    const ok = window.confirm("Delete this task? This cannot be undone.");
+    if (!ok) return;
+
+    await tasks.delete.mutateAsync(taskId);
+
+    if (selectedTaskId === taskId) setSelectedTaskId("");
+  };
+
+  const handleDeleteArchivedAll = async () => {
+    const ok = window.confirm("Delete all archived tasks? This cannot be undone.");
+    if (!ok) return;
+
+    await tasks.deleteArchivedAll.mutateAsync();
+
+    setSelectedTaskId("");
+  };
 
   const effectiveTaskId = useMemo(() => {
     if (runningTaskId) return runningTaskId;
@@ -81,6 +98,10 @@ function TimerPage() {
           onCreateTask={handleCreateTask}
           creatingTask={tasks.create.isPending}
           onArchiveTask={handleArchiveTask}
+          onDeleteTask={handleDeleteTask}
+          deletingTask={tasks.delete.isPending}
+          onDeleteArchivedAll={handleDeleteArchivedAll}
+          deletingArchivedAll={tasks.deleteArchivedAll.isPending}
         />
 
         <div className="card bg-base-300 lg:col-span-2">
