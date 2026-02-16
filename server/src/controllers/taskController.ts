@@ -79,3 +79,36 @@ export async function archiveTaskController(req: Request, res: Response) {
     return res.status(500).json({ error: "Failed to archive task" });
   }
 }
+
+// Delete a task (hard delete)
+export async function deleteTaskController(req: Request, res: Response) {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const { taskId } = req.params;
+
+    const deleted = await queries.deleteTaskById(String(taskId), userId);
+    if (!deleted) return res.status(404).json({ error: "Task not found" });
+
+    return res.status(200).json({ ok: true, deletedTaskId: taskId });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return res.status(500).json({ error: "Failed to delete task" });
+  }
+}
+
+// Delete all archived tasks
+export async function deleteArchivedTasksController(req: Request, res: Response) {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const result = await queries.deleteAllArchivedTasks(userId);
+
+    return res.status(200).json({ ok: true, ...result });
+  } catch (error) {
+    console.error("Error deleting archived tasks:", error);
+    return res.status(500).json({ error: "Failed to delete archived tasks" });
+  }
+}

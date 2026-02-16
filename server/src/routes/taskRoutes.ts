@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getTasksByProject, postTaskToProject, archiveTaskController } from "../controllers/taskController";
+import { getTasksByProject, postTaskToProject, archiveTaskController, deleteTaskController, deleteArchivedTasksController } from "../controllers/taskController";
 
 const router = Router();
 
@@ -11,5 +11,10 @@ export const taskRouter = Router();
 
 // /api/tasks/:taskId/archive
 taskRouter.patch("/:taskId/archive", archiveTaskController);
+// /api/tasks/:taskId
+taskRouter.delete("/:taskId", deleteTaskController);
+// /api/tasks/archived/all
+taskRouter.delete("/archived/all", deleteArchivedTasksController);
+
 
 export default router;
