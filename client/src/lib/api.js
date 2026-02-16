@@ -94,3 +94,39 @@ export const deleteComment = async ({commentId}) => {
   const {data} = await api.delete(`/comments/${commentId}`);
   return data;
 };
+
+// pomodoro api
+export const getPomodoro = async () => {
+  const { data } = await api.get("/pomodoro");
+  return data; // { settings, state }
+};
+
+export const updatePomodoroSettings = async (patch) => {
+  const { data } = await api.patch("/pomodoro/settings", patch);
+  return data; // settings
+};
+
+export const startPomodoro = async ({ taskId } = {}) => {
+  const { data } = await api.post("/pomodoro/start", { taskId });
+  return data; // state
+};
+
+export const pausePomodoro = async () => {
+  const { data } = await api.post("/pomodoro/pause");
+  return data; // state
+};
+
+export const resumePomodoro = async () => {
+  const { data } = await api.post("/pomodoro/resume");
+  return data; // state
+};
+
+export const completePomodoro = async () => {
+  const { data } = await api.post("/pomodoro/complete");
+  return data; // state
+};
+
+export const switchPomodoroPhase = async ({ phase, taskId } = {}) => {
+  const { data } = await api.post("/pomodoro/switch", { phase, taskId });
+  return data; // state
+};

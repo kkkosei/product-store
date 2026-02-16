@@ -1,4 +1,4 @@
-function TimerStats({ running, selectedTaskTitle }) {
+function TimerStats({ running, phase, remainingLabel, selectedTaskTitle }) {
   return (
     <div className="stats bg-base-200 stats-vertical sm:stats-horizontal">
       <div className="stat">
@@ -10,6 +10,18 @@ function TimerStats({ running, selectedTaskTitle }) {
             <span className="badge badge-error">stopped</span>
           )}
         </div>
+      </div>
+
+      <div className="stat">
+        <div className="stat-title">Phase</div>
+        <div className="stat-value text-lg">{phase}</div>
+        <div className="stat-desc">work / break / longbreak</div>
+      </div>
+
+      <div className="stat">
+        <div className="stat-title">Remaining</div>
+        <div className="stat-value text-lg">{remainingLabel}</div>
+        <div className="stat-desc">counts down while running</div>
       </div>
 
       <div className="stat">

@@ -1,17 +1,36 @@
-function TimerControls({ canStart, canStop, onStart, onStop, isStarting, isStopping }) {
+function TimerControls({
+  canStart,
+  canPause,
+  canResume,
+  onStart,
+  onPause,
+  onResume,
+  onComplete,
+  isStarting,
+  isPausing,
+  isResuming,
+  isCompleting,
+}) {
   return (
     <div className="flex gap-2">
-      <button className="btn btn-primary" disabled={!canStart} onClick={onStart}>
-        {isStarting && <span className="loading loading-spinner loading-xs" />}
+      <button className="btn btn-primary" disabled={!canStart || isStarting} onClick={onStart}>
         Start
       </button>
 
-      <button className="btn btn-error" disabled={!canStop} onClick={onStop}>
-        {isStopping && <span className="loading loading-spinner loading-xs" />}
-        Stop
+      <button className="btn" disabled={!canPause || isPausing} onClick={onPause}>
+        Pause
+      </button>
+
+      <button className="btn" disabled={!canResume || isResuming} onClick={onResume}>
+        Resume
+      </button>
+
+      <button className="btn btn-outline" disabled={isCompleting} onClick={onComplete}>
+        Complete
       </button>
     </div>
   );
 }
+
 
 export default TimerControls;
