@@ -21,8 +21,7 @@ function TimerPage() {
   const running = pState?.status === "running";
   const runningTaskId = pState?.taskId ?? "";
 
-  // effectiveProjectId を決める前に tasksQ が必要なので、先に一旦候補を決める
-  // -> projectsQ ベースの選択を優先（runningProjectId はあとで逆引き）
+
   const baseProjectId = useMemo(() => {
     if (selectedProjectId) return selectedProjectId;
     if (projectsQ.data?.length) return projectsQ.data[0].id;
@@ -31,27 +30,6 @@ function TimerPage() {
 
   const tasks = useTasks(baseProjectId);
   const tasksQ = tasks.tasksQ;
-
-  // running中は、そのタスクが属するプロジェクトを採用したい
-  const runningProjectId = useMemo(() => {
-    if (!runningTaskId) return "";
-    const t = tasksQ.data?.find((x) => x.id === runningTaskId);
-    return t?.projectId ?? "";
-  }, [runningTaskId, tasksQ.data]);
-
-  const effectiveProjectId = useMemo(() => {
-    if (runningProjectId) return runningProjectId;
-    return baseProjectId;
-  }, [runningProjectId, baseProjectId]);
-
-  // effectiveProjectId が変わったら tasks hook も変えたいので、再取得
-  // ※ ここで hook を二回呼べないので、実装を単純化するなら
-  // 「running中はProjectSelectをロックする」のが現実的。
-  // まずは「ProjectSelectロック」で進める。
-  // ----
-  // シンプル運用：running中は projectId を変えない
-  // effectiveProjectId が baseProjectId とズレるケースを避けるため、
-  // running中は baseProjectId を動かさない（ProjectSelect disabled化を推奨）
 
   const handleCreateTask = (title) => tasks.create.mutateAsync(title);
 
@@ -97,7 +75,7 @@ function TimerPage() {
   const canPause = running && !pomodoro.pause.isPending;
   const canResume = pState?.status === "paused" && !pomodoro.resume.isPending;
 
-  // 残り0秒で自動 complete
+
   useEffect(() => {
     if (!pState) return;
     if (pState.status !== "running") return;
@@ -120,7 +98,7 @@ function TimerPage() {
         projects={projectsQ.data}
         projectId={baseProjectId}
         onChange={(newProjectId) => {
-          if (running) return; // running中はロック（バグ回避）
+          if (running) return; // lock
           setSelectedProjectId(newProjectId);
           setSelectedTaskId("");
         }}
@@ -132,7 +110,7 @@ function TimerPage() {
           selectedTaskId={effectiveTaskId}
           runningTaskId={runningTaskId}
           onSelectTask={(id) => {
-            if (running) return; // running中に切替しない（まずは安全に）
+            if (running) return;
             setSelectedTaskId(id);
           }}
           onCreateTask={handleCreateTask}
