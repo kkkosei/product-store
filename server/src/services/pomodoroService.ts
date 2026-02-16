@@ -117,6 +117,24 @@ export async function pause(userId: string) {
   if (!state.startedAt || !state.endsAt) return state;
 
   const now = new Date();
+
+  // persist partial work time before freezing
+  if (state.phase === "work" && state.taskId) {
+    const settings = await ensureSettings(userId);
+    const startedAt = new Date(state.startedAt);
+    const elapsedSecRaw = Math.max(0, Math.floor((now.getTime() - startedAt.getTime()) / 1000));
+    const elapsedSec = clamp(elapsedSecRaw, 0, settings.workSec);
+    if (elapsedSec > 0) {
+      await queries.insertTimerSession({
+        userId,
+        taskId: state.taskId,
+        startedAt,
+        endedAt: now,
+        durationSec: elapsedSec,
+      });
+    }
+  }
+
   const remainingSec = Math.max(
     0,
     Math.floor((new Date(state.endsAt).getTime() - now.getTime()) / 1000)
