@@ -31,10 +31,10 @@ function TaskList({
   return (
     <div className="card bg-base-300 lg:col-span-1">
       <div className="card-body">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Tasks</h2>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 max-w-full">
             {tasksQ.isFetching && (
               <span className="loading loading-spinner loading-xs" />
             )}
@@ -58,11 +58,11 @@ function TaskList({
               <button
                 type="button"
                 className="btn btn-ghost btn-xs"
-                onClick={() => { onDeleteArchivedAll?.().catch(() => {}); }}
+                onClick={() => { onDeleteArchivedAll().catch(() => {}); }}
                 disabled={deletingArchivedAll || tasksQ.isFetching}
                 title="Delete all archived tasks"
               >
-                Delete all archived tasks
+                Delete archived
               </button>
             )}
           </div>
@@ -101,14 +101,14 @@ function TaskList({
         ) : tasksQ.error ? (
           <div className="alert alert-error">Failed to load tasks</div>
         ) : (
-          <ul className="menu bg-base-200 rounded-box">
+          <ul className="w-full flex flex-col gap-2">
             {tasksQ.data?.map((t) => {
               const active = selectedTaskId === t.id;
               const isRunningTask = runningTaskId === t.id;
 
               return (
-                <li key={t.id} className="group">
-                  <div className="flex items-center justify-between gap-2 w-full">
+                <li key={t.id} className={`group w-full rounded-box bg-base-200 ${active ? "ring-2 ring-primary" : ""}`}>
+                  <div className="flex items-center justify-between gap-2 w-full min-w-0 p-2 overflow-hidden">
                     <button
                       className={`btn btn-ghost btn-sm justify-start flex-1 min-w-0 ${active ? "btn-active" : ""}`}
                       onClick={() => onSelectTask(t.id)}
@@ -145,7 +145,7 @@ function TaskList({
                       <button
                         type="button"
                         className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
-                        onClick={() => { onDeleteTask?.(t.id).catch(() => {}); }}
+                        onClick={() => { onDeleteTask(t.id).catch(() => {}); }}
                         disabled={isRunningTask || deletingTask}
                         title={isRunningTask ? "Stop timer first" : "Delete task"}
                       >

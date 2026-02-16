@@ -57,7 +57,9 @@ function TimerPage() {
 
     await tasks.deleteArchivedAll.mutateAsync();
 
-    setSelectedTaskId("");
+    // Only clear selection if the selected task was archived
+    const selected = tasksQ.data?.find((t) => t.id === selectedTaskId);
+    if (selected?.status === "archived") setSelectedTaskId("");
   };
 
   const effectiveTaskId = useMemo(() => {
