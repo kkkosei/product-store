@@ -182,45 +182,45 @@ export async function complete(userId: string) {
   const settings = await ensureSettings(userId);
   const state = await ensureState(userId);
 
-  if (state.status !== "running" || !state.startedAt) {
-    throw new Error("Pomodoro is not running");
-  }
-
   const phase = state.phase as PomodoroPhase;
   assertPhase(phase);
 
+  // Prevent phantom cycle increments when the timer was never started
+  if (state.status === "idle" && phase === "work") return state;
+
   const now = new Date();
-  const startedAt = new Date(state.startedAt);
 
-  const plannedSec = getPhaseDurationSec(settings, phase);
-  const elapsedSecRaw = Math.max(0, Math.floor((now.getTime() - startedAt.getTime()) / 1000));
-  const elapsedSec = clamp(elapsedSecRaw, 0, plannedSec);
-
-  // work only -> persist study time
-  if (phase === "work") {
-    if (!state.taskId) throw new Error("taskId is required for work phase");
+  if (phase === "work" && state.status === "running") {
+    if (!state.startedAt) throw new Error("startedAt missing");
+    if (!state.taskId) throw new Error("taskId missing");
 
     const owned = await queries.getTaskOwnedByUser(state.taskId, userId);
     if (!owned) throw new Error("Task not found");
 
-    if (elapsedSec > 0) {
+    const startedAt = new Date(state.startedAt);
+    const elapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+    const duration = clamp(elapsed, 0, settings.workSec);
+
+    if (duration > 0) {
       await queries.insertTimerSession({
         userId,
         taskId: state.taskId,
         startedAt,
         endedAt: now,
-        durationSec: elapsedSec,
+        durationSec: duration,
       });
     }
   }
 
-  // decide next phase + cycle
   let nextPhase: PomodoroPhase;
-  let nextCycleCount = state.cycleCount;
+  let nextCycle = state.cycleCount;
 
   if (phase === "work") {
-    nextCycleCount = state.cycleCount + 1;
-    const isLong = nextCycleCount % settings.longBreakEvery === 0;
+    nextCycle += 1;
+
+    const isLong =
+      nextCycle % settings.longBreakEvery === 0;
+
     nextPhase = isLong ? "longbreak" : "break";
   } else {
     nextPhase = "work";
@@ -231,23 +231,31 @@ export async function complete(userId: string) {
       ? true
       : settings.autoStartNext;
 
-  const nextDurationSec = getPhaseDurationSec(settings, nextPhase);
-  const nextStartedAt = autoStart ? now : null;
-  const nextEndsAt = autoStart ? new Date(now.getTime() + nextDurationSec * 1000) : null;
+  const durationSec = getPhaseDurationSec(settings, nextPhase);
+
+  // Re-validate task ownership before auto-starting the next work phase
+  if (nextPhase === "work" && state.taskId) {
+  const owned = await queries.getTaskOwnedByUser(state.taskId, userId);
+    if (!owned) throw new Error("Task not found or no longer owned; switch to a valid task first");
+  }
 
   await queries.updatePomodoroStateByUserId(userId, {
     phase: nextPhase,
     status: autoStart ? "running" : "idle",
-    startedAt: nextStartedAt,
-    endsAt: nextEndsAt,
-    taskId: nextPhase === "work" ? state.taskId : null,
-    cycleCount: nextCycleCount,
+    startedAt: autoStart ? now : null,
+    endsAt: autoStart
+      ? new Date(now.getTime() + durationSec * 1000)
+      : null,
+    taskId: state.taskId ?? null,
+    cycleCount: nextCycle,
   });
 
   const next = await queries.getPomodoroStateByUserId(userId);
   if (!next) throw new Error("Failed to load state");
+
   return next;
 }
+
 
 export async function switchPhase(
   userId: string,
