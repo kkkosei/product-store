@@ -31,8 +31,9 @@ function TimerPage() {
 
   const projectId = useMemo(() => {
     if (selectedProjectId) return selectedProjectId;
+    if (isLocked && pState?.task?.projectId) return pState.task.projectId;
     return projectsQ.data?.[0]?.id ?? "";
-  }, [selectedProjectId, projectsQ.data]);
+  }, [selectedProjectId, pState?.task?.projectId, projectsQ.data, isLocked]);
 
   const tasks = useTasks(projectId);
   const tasksQ = tasks.tasksQ;
