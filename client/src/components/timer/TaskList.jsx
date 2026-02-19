@@ -143,8 +143,8 @@ function TaskList({
                           type="button"
                           className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
                           onClick={() => { onArchiveTask(t.id).catch(() => {}); }}
-                          disabled={isRunningTask}
-                          title={isRunningTask ? "Stop timer first" : "Archive task"}
+                          disabled={isCurrentPomodoroTask}
+                          title={isCurrentPomodoroTask ? "Stop timer first" : "Archive task"}
                         >
                           complete
                         </button>
@@ -154,8 +154,8 @@ function TaskList({
                         type="button"
                         className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
                         onClick={() => { onDeleteTask(t.id).catch(() => {}); }}
-                        disabled={isRunningTask || deletingTask}
-                        title={isRunningTask ? "Stop timer first" : "Delete task"}
+                        disabled={isCurrentPomodoroTask || deletingTask}
+                        title={isCurrentPomodoroTask ? "Stop timer first" : "Delete task"}
                       >
                         delete
                       </button>

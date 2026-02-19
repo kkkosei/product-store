@@ -38,9 +38,7 @@ function TimerPage() {
   const tasksQ = tasks.tasksQ;
 
   const effectiveTaskId = useMemo(() => {
-  return status === "running"
-    ? runningTaskId
-    : selectedTaskId;
+    return status !== "idle" ? runningTaskId : selectedTaskId;
   }, [status, runningTaskId, selectedTaskId]);
 
 
@@ -127,7 +125,7 @@ function TimerPage() {
   
   // UI flags
   const canStart = !!effectiveTaskId && status === "idle" && !isBusy;
-  const canComplete = !!pState && !pomodoro.complete.isPending;
+  const canComplete = !!pState && status !== "idle" && !pomodoro.complete.isPending;
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">

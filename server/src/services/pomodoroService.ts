@@ -185,6 +185,9 @@ export async function complete(userId: string) {
   const phase = state.phase as PomodoroPhase;
   assertPhase(phase);
 
+  // Prevent phantom cycle increments when the timer was never started
+  if (state.status === "idle" && phase === "work") return state;
+
   const now = new Date();
 
   if (phase === "work" && state.status === "running") {
@@ -229,6 +232,12 @@ export async function complete(userId: string) {
       : settings.autoStartNext;
 
   const durationSec = getPhaseDurationSec(settings, nextPhase);
+
+  // Re-validate task ownership before auto-starting the next work phase
+  if (nextPhase === "work" && state.taskId) {
+  const owned = await queries.getTaskOwnedByUser(state.taskId, userId);
+    if (!owned) throw new Error("Task not found or no longer owned; switch to a valid task first");
+  }
 
   await queries.updatePomodoroStateByUserId(userId, {
     phase: nextPhase,
