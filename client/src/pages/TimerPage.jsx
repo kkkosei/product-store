@@ -3,7 +3,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { useMyProjects } from "../hooks/useProjects";
 import { useTasks } from "../hooks/useTasks";
 import { usePomodoro } from "../hooks/usePomodoro";
-import { getRemainingSec, formatMMSS } from "../lib/time";
+import { formatMMSS, getRemainingSec } from "../lib/time";
 
 import ProjectSelect from "../components/timer/ProjectSelect";
 import TaskList from "../components/timer/TaskList";
@@ -11,50 +11,84 @@ import TimerStats from "../components/timer/TimerStats";
 import TimerControls from "../components/timer/TimerControls";
 
 function TimerPage() {
+
+  // Local UI state
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedTaskId, setSelectedTaskId] = useState("");
 
+  // Data hooks
   const projectsQ = useMyProjects();
   const pomodoro = usePomodoro();
   const pState = pomodoro.state;
 
-  const running = pState?.status === "running";
+
+  // Derived state
+  const status = pState?.status ?? "idle";
+  const isLocked = status !== "idle";
+  const phase = pState?.phase ?? "work";
+
   const runningTaskId = pState?.taskId ?? "";
 
-  // Force re-render every second while running for smooth countdown
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    if (!running) return;
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
-    return () => clearInterval(id);
-  }, [running]);
-
-
-  const baseProjectId = useMemo(() => {
+  const projectId = useMemo(() => {
     if (selectedProjectId) return selectedProjectId;
-    if (projectsQ.data?.length) return projectsQ.data[0].id;
-    return "";
+    return projectsQ.data?.[0]?.id ?? "";
   }, [selectedProjectId, projectsQ.data]);
 
-  const tasks = useTasks(baseProjectId);
+  const tasks = useTasks(projectId);
   const tasksQ = tasks.tasksQ;
 
-  const handleCreateTask = (title) => tasks.create.mutateAsync(title);
+  const effectiveTaskId = useMemo(() => {
+  return status === "running"
+    ? runningTaskId
+    : selectedTaskId;
+  }, [status, runningTaskId, selectedTaskId]);
 
-  const handleArchiveTask = async (taskId) => {
-    const result = await tasks.archive.mutateAsync(taskId);
-    if (!result) return;
+
+  const selectedTaskTitle = useMemo(() => {
+    if (!tasksQ.data?.length) return null;
+    const task = tasksQ.data.find((t) => t.id === effectiveTaskId);
+    return task?.title ?? null;
+  }, [tasksQ.data, effectiveTaskId]);
+
+  const remainingSec = getRemainingSec(pState);
+  const remainingLabel = formatMMSS(remainingSec);
+
+  const isBusy =
+    pomodoro.start.isPending ||
+    pomodoro.pause.isPending ||
+    pomodoro.resume.isPending ||
+    pomodoro.complete.isPending;
+
+  // Actions (event handlers)
+  const changeProject = (newProjectId) => {
+    if (isLocked) return;
+    setSelectedProjectId(newProjectId);
+    setSelectedTaskId("");
+  };
+
+  const selectTask = (taskId) => {
+    if (isLocked) return;
+    setSelectedTaskId(taskId);
+  };
+
+  const createTask = (title) => tasks.create.mutateAsync(title);
+
+  const archiveTask = async (taskId) => {
+    const updated = await tasks.archive.mutateAsync(taskId);
+    if (!updated) return;
     if (selectedTaskId === taskId) setSelectedTaskId("");
   };
 
-  const handleDeleteTask = async (taskId) => {
+  const deleteTask = async (taskId) => {
     const ok = window.confirm("Delete this task? This cannot be undone.");
     if (!ok) return;
+
     await tasks.delete.mutateAsync(taskId);
+
     if (selectedTaskId === taskId) setSelectedTaskId("");
   };
 
-  const handleDeleteArchivedAll = async () => {
+  const deleteArchivedAll = async () => {
     const ok = window.confirm("Delete all archived tasks? This cannot be undone.");
     if (!ok) return;
 
@@ -64,52 +98,43 @@ function TimerPage() {
     if (selected?.status === "archived") setSelectedTaskId("");
   };
 
-  const effectiveTaskId = useMemo(() => {
-    if (runningTaskId) return runningTaskId;
-    return selectedTaskId;
-  }, [runningTaskId, selectedTaskId]);
-
-  const selectedTaskTitle = useMemo(() => {
-    if (!tasksQ.data?.length) return null;
-    const t = tasksQ.data.find((t) => t.id === effectiveTaskId);
-    return t?.title ?? null;
-  }, [tasksQ.data, effectiveTaskId]);
-
-  const phase = pState?.phase ?? "work";
-  const remainingLabel = formatMMSS(getRemainingSec(pState));
-
-  // Start / Pause / Resume / Complete
-  const canStart = !!effectiveTaskId && !running && !pomodoro.start.isPending;
-  const canPause = running && !pomodoro.pause.isPending;
-  const canResume = pState?.status === "paused" && !pomodoro.resume.isPending;
-
+  const start = () => pomodoro.start.mutate({ taskId: effectiveTaskId });
+  const pause = () => pomodoro.pause.mutate();
+  const resume = () => pomodoro.resume.mutate();
+  const complete = () => pomodoro.complete.mutate();
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    if (!pState) return;
-    if (pState.status !== "running") return;
-    if (pomodoro.complete.isPending) return;
+  if (status !== "running") return;
+  const id = setInterval(() => setTick((t) => t + 1), 1000);
+  return () => clearInterval(id);
+  }, [status]);
 
-    const remaining = getRemainingSec(pState);
-    if (remaining > 0) return;
+  // Auto complete when timer hits 0
+  useEffect(() => {
+    if (!pState) return;
+    if (status !== "running") return;
+    if (pomodoro.complete.isPending) return;
+    if (remainingSec > 0) return;
 
     pomodoro.complete.mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pState?.endsAt, pState?.status]);
+  }, [pState, status, remainingSec, pomodoro.complete.isPending, pomodoro.complete]);
 
+
+  // Guards
   if (projectsQ.isLoading) return <LoadingSpinner />;
-  if (projectsQ.error)
-    return <div className="alert alert-error">Failed to load projects</div>;
+  if (projectsQ.error) return <div className="alert alert-error">Failed to load projects</div>;
+  
+  // UI flags
+  const canStart = !!effectiveTaskId && status === "idle" && !isBusy;
+  const canComplete = !!pState && !pomodoro.complete.isPending;
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
       <ProjectSelect
         projects={projectsQ.data}
-        projectId={baseProjectId}
-        onChange={(newProjectId) => {
-          if (running) return; // lock
-          setSelectedProjectId(newProjectId);
-          setSelectedTaskId("");
-        }}
+        projectId={projectId}
+        onChange={changeProject}
       />
 
       <div className="grid lg:grid-cols-3 gap-4">
@@ -117,16 +142,15 @@ function TimerPage() {
           tasksQ={tasksQ}
           selectedTaskId={effectiveTaskId}
           runningTaskId={runningTaskId}
-          onSelectTask={(id) => {
-            if (running) return;
-            setSelectedTaskId(id);
-          }}
-          onCreateTask={handleCreateTask}
+          isLocked={isLocked}
+          pomodoroStatus={status}
+          onSelectTask={selectTask}
+          onCreateTask={createTask}
           creatingTask={tasks.create.isPending}
-          onArchiveTask={handleArchiveTask}
-          onDeleteTask={handleDeleteTask}
+          onArchiveTask={archiveTask}
+          onDeleteTask={deleteTask}
           deletingTask={tasks.delete.isPending}
-          onDeleteArchivedAll={handleDeleteArchivedAll}
+          onDeleteArchivedAll={deleteArchivedAll}
           deletingArchivedAll={tasks.deleteArchivedAll.isPending}
         />
 
@@ -139,31 +163,26 @@ function TimerPage() {
               )}
             </div>
 
-            <TimerStats
-              running={running}
-              phase={phase}
-              remainingLabel={remainingLabel}
-              selectedTaskTitle={selectedTaskTitle}
+            <TimerStats 
+              status={status} 
+              phase={phase} 
+              remainingLabel={remainingLabel} 
+              selectedTaskTitle={selectedTaskTitle} 
             />
 
             {!effectiveTaskId && (
-              <div className="alert alert-warning">
-                Select a task from the left to start.
-              </div>
+              <div className="alert alert-warning">Select a task from the left to start.</div>
             )}
 
             <TimerControls
+              status={status}
               canStart={canStart}
-              canPause={canPause}
-              canResume={canResume}
-              onStart={() => pomodoro.start.mutate({ taskId: effectiveTaskId })}
-              onPause={() => pomodoro.pause.mutate()}
-              onResume={() => pomodoro.resume.mutate()}
-              onComplete={() => pomodoro.complete.mutate()}
-              isStarting={pomodoro.start.isPending}
-              isPausing={pomodoro.pause.isPending}
-              isResuming={pomodoro.resume.isPending}
-              isCompleting={pomodoro.complete.isPending}
+              canComplete={canComplete}
+              onStart={start}
+              onPause={pause}
+              onResume={resume}
+              onComplete={complete}
+              busy={isBusy}
             />
 
             {(pomodoro.start.error ||

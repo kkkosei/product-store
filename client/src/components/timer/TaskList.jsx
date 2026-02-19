@@ -5,6 +5,8 @@ function TaskList({
   tasksQ,
   selectedTaskId,
   runningTaskId,
+  pomodoroStatus,
+  isLocked,
   onSelectTask,
 
   onCreateTask,
@@ -104,7 +106,9 @@ function TaskList({
           <ul className="w-full flex flex-col gap-2">
             {tasksQ.data?.map((t) => {
               const active = selectedTaskId === t.id;
-              const isRunningTask = runningTaskId === t.id;
+              const isCurrentPomodoroTask = runningTaskId === t.id;
+              const isRunningTask = isCurrentPomodoroTask && pomodoroStatus === "running";
+              const isPausedTask = isCurrentPomodoroTask && pomodoroStatus === "paused";
 
               return (
                 <li key={t.id} className={`group w-full rounded-box bg-base-200 ${active ? "ring-2 ring-primary" : ""}`}>
@@ -113,6 +117,8 @@ function TaskList({
                       className={`btn btn-ghost btn-sm justify-start flex-1 min-w-0 ${active ? "btn-active" : ""}`}
                       onClick={() => onSelectTask(t.id)}
                       type="button"
+                      disabled={isLocked}
+                      title={isLocked ? "Stop / reset Pomodoro to select tasks" : "Select task"}
                     >
                       <span className="truncate">{t.title}</span>
                     </button>
@@ -120,6 +126,8 @@ function TaskList({
                     <div className="flex items-center gap-2 shrink-0">
                       {isRunningTask ? (
                         <span className="badge badge-success whitespace-nowrap">running</span>
+                      ) : isPausedTask ? (
+                        <span className="badge badge-warning whitespace-nowrap">paused</span>
                       ) : t.status === "archived" ? (
                         <span className="badge badge-outline badge-success whitespace-nowrap">
                           archived

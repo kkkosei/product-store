@@ -1,13 +1,15 @@
-function TimerStats({ running, phase, remainingLabel, selectedTaskTitle }) {
+function TimerStats({ status, phase, remainingLabel, selectedTaskTitle }) {
   return (
     <div className="stats bg-base-200 stats-vertical sm:stats-horizontal">
       <div className="stat">
         <div className="stat-title">Status</div>
         <div className="stat-desc">
-          {running ? (
+          {status === "running" ? (
             <span className="badge badge-success">running</span>
+          ) : status === "paused" ? (
+            <span className="badge badge-warning">paused</span>
           ) : (
-            <span className="badge badge-error">stopped</span>
+            <span className="badge badge-error">idle</span>
           )}
         </div>
       </div>

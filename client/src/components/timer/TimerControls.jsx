@@ -1,36 +1,42 @@
 function TimerControls({
+  status, // "idle" | "running" | "paused"
   canStart,
-  canPause,
-  canResume,
+  canComplete,
   onStart,
   onPause,
   onResume,
   onComplete,
-  isStarting,
-  isPausing,
-  isResuming,
-  isCompleting,
+  busy,
 }) {
+  const main =
+    status === "running"
+      ? { label: "Pause", onClick: onPause, className: "btn btn-warning" }
+      : status === "paused"
+      ? { label: "Resume", onClick: onResume, className: "btn btn-success" }
+      : { label: "Start", onClick: onStart, className: "btn btn-primary" };
+
+  const mainDisabled =
+    busy || (status === "idle" && !canStart);
+
   return (
-    <div className="flex gap-2">
-      <button className="btn btn-primary" disabled={!canStart || isStarting} onClick={onStart}>
-        Start
+    <div className="flex gap-2 flex-wrap">
+      <button
+        className={main.className}
+        disabled={mainDisabled}
+        onClick={main.onClick}
+      >
+        {main.label}
       </button>
 
-      <button className="btn" disabled={!canPause || isPausing} onClick={onPause}>
-        Pause
-      </button>
-
-      <button className="btn" disabled={!canResume || isResuming} onClick={onResume}>
-        Resume
-      </button>
-
-       <button className="btn btn-outline" disabled={!onComplete || isCompleting} onClick={onComplete}>
+      <button
+        className="btn btn-outline"
+        disabled={!canComplete || busy}
+        onClick={onComplete}
+      >
         Complete
       </button>
     </div>
   );
 }
-
 
 export default TimerControls;
