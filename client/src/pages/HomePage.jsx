@@ -37,31 +37,32 @@ function HomePage() {
           <p className="py-4 text-base-content/60">
             Upload, discover, and connect with learners.
           </p>
-          <div className="flex space-x-4">
-            <SignInButton mode="modal">
-              <button className="btn btn-primary">
-                <SparklesIcon className="size-4" />
-                Start Studying
-              </button>
-            </SignInButton>
-            {isSignedIn ? (
-              <Link to="/timer" className="btn btn-primary">
-                timer & task
-              </Link>
-            ) : (
+          <div className="flex flex-col gap-2">
+            <div className="flex space-x-4">
               <SignInButton mode="modal">
                 <button className="btn btn-primary">
-                  timer & task
+                  <SparklesIcon className="size-4" />
+                  Start Studying
                 </button>
               </SignInButton>
-            )}
+              {isSignedIn ? (
+                <Link to="/timer" className="btn btn-primary">
+                 timer & task
+                </Link>
+              ) : (
+                <SignInButton mode="modal">
+                  <button className="btn btn-primary">
+                    timer & task
+                  </button>
+                </SignInButton>
+              )}
+            </div>
             {!isSignedIn && (
-              <p className="text-sm text-base-content/50 mt-2">
+              <p className="text-sm text-base-content/50">
                 Please sign in to access the timer feature.
               </p>
             )}
           </div>
-
         </div>
       </div>
     </div>
