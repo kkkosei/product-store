@@ -3,10 +3,12 @@ import { PackageIcon, SparklesIcon } from "lucide-react";
 import { Link } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProjectCard from "../components/ProjectCard";
-import { SignInButton } from "@clerk/clerk-react";
+import { SignInButton, useAuth } from "@clerk/clerk-react";
 
 function HomePage() {
   const { data: projects, isLoading, error } = useProjects();
+  const { isSignedIn } = useAuth();
+
 
   if(isLoading) return <LoadingSpinner />;
   if(error) return (
@@ -42,9 +44,22 @@ function HomePage() {
                 Start Studying
               </button>
             </SignInButton>
-            <Link to="/timer" className="btn btn-primary">
-              timer & task
-            </Link> 
+            {isSignedIn ? (
+              <Link to="/timer" className="btn btn-primary">
+                timer & task
+              </Link>
+            ) : (
+              <SignInButton mode="modal">
+                <button className="btn btn-primary">
+                  timer & task
+                </button>
+              </SignInButton>
+            )}
+            {!isSignedIn && (
+              <p className="text-sm text-base-content/50 mt-2">
+                Please sign in to access the timer feature.
+              </p>
+            )}
           </div>
 
         </div>
